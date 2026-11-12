@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="SajamKnjiga.Core/SajamKnjiga.Core.csproj" />
+  <Project Path="SajamKnjiga.Console/SajamKnjiga.Console.csproj" />
+</Solution>

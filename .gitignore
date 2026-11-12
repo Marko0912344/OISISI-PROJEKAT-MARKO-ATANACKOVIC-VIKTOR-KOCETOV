@@ -1,0 +1,16 @@
+# Visual Studio / .NET
+.vs/
+**/bin/
+**/obj/
+*.user
+*.suo
+**/TestResults/
+
+# Radni podaci i rezervne kopije
+**/Data/
+**/Backups/
+**/Transakcije/
+**/Exports/
+*.bak
+*.tmp
+*.zip
