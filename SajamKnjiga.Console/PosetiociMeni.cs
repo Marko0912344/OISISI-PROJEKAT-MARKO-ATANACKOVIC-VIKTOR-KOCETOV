@@ -100,6 +100,17 @@ public class PosetiociMeni : IMeniModul
         System.Console.Write("Email: ");
         string email = System.Console.ReadLine() ?? "";
 
+
+        if (string.IsNullOrWhiteSpace(ime) ||
+            string.IsNullOrWhiteSpace(prezime) ||
+            string.IsNullOrWhiteSpace(email))
+        {
+            System.Console.WriteLine(
+                "Ime, prezime i email su obavezni podaci.");
+
+            return;
+        }
+
         System.Console.Write("Telefon: ");
         string telefon = System.Console.ReadLine() ?? "";
 
@@ -115,15 +126,32 @@ public class PosetiociMeni : IMeniModul
             return;
         }
 
+        if (datumRodjenja.Date > DateTime.Today)
+        {
+            System.Console.WriteLine(
+                "Datum rodjenja ne moze biti u buducnosti.");
+            return;
+        }
+
         System.Console.Write("Broj clanske karte: ");
         string brojKarte = System.Console.ReadLine() ?? "";
 
+
         System.Console.Write("Godina clanstva: ");
+
         if (!int.TryParse(System.Console.ReadLine(), out int godina))
         {
-            System.Console.WriteLine("Neispravna godina.");
+            System.Console.WriteLine("Godina mora biti broj.");
             return;
         }
+
+        if (godina < 1900 || godina > DateTime.Now.Year)
+        {
+            System.Console.WriteLine(
+                "Godina clanstva nije ispravna.");
+            return;
+        }
+
 
         System.Console.Write("Status (R - Redovan, V - VIP): ");
         string statusUnos = (System.Console.ReadLine() ?? "")
@@ -161,9 +189,11 @@ public class PosetiociMeni : IMeniModul
         }
     }
 
+
     private void Izmeni()
     {
         System.Console.Write("ID posetioca: ");
+
         if (!int.TryParse(System.Console.ReadLine(), out int id))
         {
             System.Console.WriteLine("Neispravan ID.");
@@ -179,29 +209,91 @@ public class PosetiociMeni : IMeniModul
             return;
         }
 
-        System.Console.Write("Novo ime: ");
+        System.Console.WriteLine(
+            "Pritisni Enter da zadrzis postojecu vrednost.");
+
+        System.Console.Write($"Ime ({postojeci.Ime}): ");
         string ime = System.Console.ReadLine() ?? "";
+        if (!string.IsNullOrWhiteSpace(ime))
+            postojeci.Ime = ime;
 
-        System.Console.Write("Novo prezime: ");
+        System.Console.Write($"Prezime ({postojeci.Prezime}): ");
         string prezime = System.Console.ReadLine() ?? "";
+        if (!string.IsNullOrWhiteSpace(prezime))
+            postojeci.Prezime = prezime;
 
-        Posetilac izmenjeni = new Posetilac
+        System.Console.Write($"Email ({postojeci.Email}): ");
+        string email = System.Console.ReadLine() ?? "";
+        if (!string.IsNullOrWhiteSpace(email))
+            postojeci.Email = email;
+
+        System.Console.Write($"Telefon ({postojeci.Telefon}): ");
+        string telefon = System.Console.ReadLine() ?? "";
+        if (!string.IsNullOrWhiteSpace(telefon))
+            postojeci.Telefon = telefon;
+
+        System.Console.Write(
+            $"Datum rodjenja ({postojeci.DatumRodjenja:dd.MM.yyyy}): ");
+
+        string datumUnos = System.Console.ReadLine() ?? "";
+
+        if (!string.IsNullOrWhiteSpace(datumUnos))
         {
-            Id = id,
-            Ime = ime,
-            Prezime = prezime,
-            Email = postojeci.Email,
-            DatumRodjenja = postojeci.DatumRodjenja,
-            Telefon = postojeci.Telefon,
-            BrojClanskeKarte = postojeci.BrojClanskeKarte,
-            GodinaClanstva = postojeci.GodinaClanstva,
-            Status = postojeci.Status,
-            ProsecnaOcena = postojeci.ProsecnaOcena,
-            AdresaId = postojeci.AdresaId
-        };
+            if (!DateTime.TryParseExact(
+                datumUnos,
+                "dd.MM.yyyy",
+                System.Globalization.CultureInfo.InvariantCulture,
+                System.Globalization.DateTimeStyles.None,
+                out DateTime datum))
+            {
+                System.Console.WriteLine("Neispravan datum.");
+                return;
+            }
 
-        if (_servis.Izmeni(izmenjeni))
-            System.Console.WriteLine("Podaci su izmenjeni.");
+            postojeci.DatumRodjenja = datum;
+        }
+
+        System.Console.Write(
+            $"Broj clanske karte ({postojeci.BrojClanskeKarte}): ");
+
+        string karta = System.Console.ReadLine() ?? "";
+        if (!string.IsNullOrWhiteSpace(karta))
+            postojeci.BrojClanskeKarte = karta;
+
+        System.Console.Write(
+            $"Godina clanstva ({postojeci.GodinaClanstva}): ");
+
+        string godinaUnos = System.Console.ReadLine() ?? "";
+
+        if (!string.IsNullOrWhiteSpace(godinaUnos))
+        {
+            if (!int.TryParse(godinaUnos, out int godina))
+            {
+                System.Console.WriteLine("Neispravna godina.");
+                return;
+            }
+
+            postojeci.GodinaClanstva = godina;
+        }
+
+        System.Console.Write(
+            $"Status ({postojeci.Status}) [R/V]: ");
+
+        string status = (System.Console.ReadLine() ?? "")
+            .Trim().ToUpperInvariant();
+
+        if (status == "R")
+            postojeci.Status = StatusPosetioca.Redovan;
+        else if (status == "V")
+            postojeci.Status = StatusPosetioca.VIP;
+        else if (status != "")
+        {
+            System.Console.WriteLine("Neispravan status.");
+            return;
+        }
+
+        if (_servis.Izmeni(postojeci))
+            System.Console.WriteLine("Podaci su uspesno izmenjeni.");
     }
 
     private void Obrisi()
