@@ -1,0 +1,253 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ArrayOfKnjiga xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Knjiga>
+    <Id>1</Id>
+    <ISBN>9788600000019</ISBN>
+    <Naziv>Senke Dunava</Naziv>
+    <Zanr>Roman</Zanr>
+    <GodinaIzdanja>2015</GodinaIzdanja>
+    <Cena>535.00</Cena>
+    <BrojStrana>133</BrojStrana>
+    <IzdavacId>1</IzdavacId>
+  </Knjiga>
+  <Knjiga>
+    <Id>2</Id>
+    <ISBN>9788600000026</ISBN>
+    <Naziv>Atlas malih zvezda</Naziv>
+    <Zanr>Naucna fantastika</Zanr>
+    <GodinaIzdanja>2016</GodinaIzdanja>
+    <Cena>580.00</Cena>
+    <BrojStrana>146</BrojStrana>
+    <IzdavacId>1</IzdavacId>
+  </Knjiga>
+  <Knjiga>
+    <Id>3</Id>
+    <ISBN>9788600000033</ISBN>
+    <Naziv>Svetionik u magli</Naziv>
+    <Zanr>Istorija</Zanr>
+    <GodinaIzdanja>2017</GodinaIzdanja>
+    <Cena>625.00</Cena>
+    <BrojStrana>159</BrojStrana>
+    <IzdavacId>1</IzdavacId>
+  </Knjiga>
+  <Knjiga>
+    <Id>4</Id>
+    <ISBN>9788600000040</ISBN>
+    <Naziv>Mala istorija astronomije</Naziv>
+    <Zanr>Poezija</Zanr>
+    <GodinaIzdanja>2018</GodinaIzdanja>
+    <Cena>670.00</Cena>
+    <BrojStrana>172</BrojStrana>
+    <IzdavacId>1</IzdavacId>
+  </Knjiga>
+  <Knjiga>
+    <Id>5</Id>
+    <ISBN>9788600000057</ISBN>
+    <Naziv>Put kroz vreme</Naziv>
+    <Zanr>Putopis</Zanr>
+    <GodinaIzdanja>2019</GodinaIzdanja>
+    <Cena>715.00</Cena>
+    <BrojStrana>185</BrojStrana>
+    <IzdavacId>1</IzdavacId>
+  </Knjiga>
+  <Knjiga>
+    <Id>6</Id>
+    <ISBN>9788600000064</ISBN>
+    <Naziv>Prozori severa</Naziv>
+    <Zanr>Misterija</Zanr>
+    <GodinaIzdanja>2020</GodinaIzdanja>
+    <Cena>760.00</Cena>
+    <BrojStrana>198</BrojStrana>
+    <IzdavacId>1</IzdavacId>
+  </Knjiga>
+  <Knjiga>
+    <Id>7</Id>
+    <ISBN>9788600000071</ISBN>
+    <Naziv>Plava reka</Naziv>
+    <Zanr>Roman</Zanr>
+    <GodinaIzdanja>2021</GodinaIzdanja>
+    <Cena>805.00</Cena>
+    <BrojStrana>211</BrojStrana>
+    <IzdavacId>1</IzdavacId>
+  </Knjiga>
+  <Knjiga>
+    <Id>8</Id>
+    <ISBN>9788600000088</ISBN>
+    <Naziv>Tajna stare biblioteke</Naziv>
+    <Zanr>Naucna fantastika</Zanr>
+    <GodinaIzdanja>2022</GodinaIzdanja>
+    <Cena>850.00</Cena>
+    <BrojStrana>224</BrojStrana>
+    <IzdavacId>2</IzdavacId>
+  </Knjiga>
+  <Knjiga>
+    <Id>9</Id>
+    <ISBN>9788600000095</ISBN>
+    <Naziv>Grad od papira</Naziv>
+    <Zanr>Istorija</Zanr>
+    <GodinaIzdanja>2023</GodinaIzdanja>
+    <Cena>895.00</Cena>
+    <BrojStrana>237</BrojStrana>
+    <IzdavacId>2</IzdavacId>
+  </Knjiga>
+  <Knjiga>
+    <Id>10</Id>
+    <ISBN>9788600000101</ISBN>
+    <Naziv>Miris borova</Naziv>
+    <Zanr>Poezija</Zanr>
+    <GodinaIzdanja>2024</GodinaIzdanja>
+    <Cena>940.00</Cena>
+    <BrojStrana>250</BrojStrana>
+    <IzdavacId>2</IzdavacId>
+  </Knjiga>
+  <Knjiga>
+    <Id>11</Id>
+    <ISBN>9788600000118</ISBN>
+    <Naziv>Pisma iz ravnice</Naziv>
+    <Zanr>Putopis</Zanr>
+    <GodinaIzdanja>2025</GodinaIzdanja>
+    <Cena>985.00</Cena>
+    <BrojStrana>263</BrojStrana>
+    <IzdavacId>2</IzdavacId>
+  </Knjiga>
+  <Knjiga>
+    <Id>12</Id>
+    <ISBN>9788600000125</ISBN>
+    <Naziv>Knjiga tihih noci</Naziv>
+    <Zanr>Misterija</Zanr>
+    <GodinaIzdanja>2014</GodinaIzdanja>
+    <Cena>1030.00</Cena>
+    <BrojStrana>276</BrojStrana>
+    <IzdavacId>2</IzdavacId>
+  </Knjiga>
+  <Knjiga>
+    <Id>13</Id>
+    <ISBN>9788600000132</ISBN>
+    <Naziv>Poslednji voz za more</Naziv>
+    <Zanr>Roman</Zanr>
+    <GodinaIzdanja>2015</GodinaIzdanja>
+    <Cena>1075.00</Cena>
+    <BrojStrana>289</BrojStrana>
+    <IzdavacId>2</IzdavacId>
+  </Knjiga>
+  <Knjiga>
+    <Id>14</Id>
+    <ISBN>9788600000149</ISBN>
+    <Naziv>Jutro na Tisi</Naziv>
+    <Zanr>Naucna fantastika</Zanr>
+    <GodinaIzdanja>2016</GodinaIzdanja>
+    <Cena>1120.00</Cena>
+    <BrojStrana>302</BrojStrana>
+    <IzdavacId>3</IzdavacId>
+  </Knjiga>
+  <Knjiga>
+    <Id>15</Id>
+    <ISBN>9788600000156</ISBN>
+    <Naziv>Suma izgubljenih prica</Naziv>
+    <Zanr>Istorija</Zanr>
+    <GodinaIzdanja>2017</GodinaIzdanja>
+    <Cena>1165.00</Cena>
+    <BrojStrana>315</BrojStrana>
+    <IzdavacId>3</IzdavacId>
+  </Knjiga>
+  <Knjiga>
+    <Id>16</Id>
+    <ISBN>9788600000163</ISBN>
+    <Naziv>Oblaci nad gradom</Naziv>
+    <Zanr>Poezija</Zanr>
+    <GodinaIzdanja>2018</GodinaIzdanja>
+    <Cena>1210.00</Cena>
+    <BrojStrana>328</BrojStrana>
+    <IzdavacId>3</IzdavacId>
+  </Knjiga>
+  <Knjiga>
+    <Id>17</Id>
+    <ISBN>9788600000170</ISBN>
+    <Naziv>Vrt od stakla</Naziv>
+    <Zanr>Putopis</Zanr>
+    <GodinaIzdanja>2019</GodinaIzdanja>
+    <Cena>1255.00</Cena>
+    <BrojStrana>341</BrojStrana>
+    <IzdavacId>3</IzdavacId>
+  </Knjiga>
+  <Knjiga>
+    <Id>18</Id>
+    <ISBN>9788600000187</ISBN>
+    <Naziv>Tragovi u pesku</Naziv>
+    <Zanr>Misterija</Zanr>
+    <GodinaIzdanja>2020</GodinaIzdanja>
+    <Cena>1300.00</Cena>
+    <BrojStrana>354</BrojStrana>
+    <IzdavacId>3</IzdavacId>
+  </Knjiga>
+  <Knjiga>
+    <Id>19</Id>
+    <ISBN>9788600000194</ISBN>
+    <Naziv>Zimska svetlost</Naziv>
+    <Zanr>Roman</Zanr>
+    <GodinaIzdanja>2021</GodinaIzdanja>
+    <Cena>1345.00</Cena>
+    <BrojStrana>367</BrojStrana>
+    <IzdavacId>3</IzdavacId>
+  </Knjiga>
+  <Knjiga>
+    <Id>20</Id>
+    <ISBN>9788600000200</ISBN>
+    <Naziv>Mape nepoznatog</Naziv>
+    <Zanr>Naucna fantastika</Zanr>
+    <GodinaIzdanja>2022</GodinaIzdanja>
+    <Cena>1390.00</Cena>
+    <BrojStrana>380</BrojStrana>
+    <IzdavacId>4</IzdavacId>
+  </Knjiga>
+  <Knjiga>
+    <Id>21</Id>
+    <ISBN>9788600000217</ISBN>
+    <Naziv>Knjiga za test brisanja</Naziv>
+    <Zanr>Istorija</Zanr>
+    <GodinaIzdanja>2023</GodinaIzdanja>
+    <Cena>1435.00</Cena>
+    <BrojStrana>393</BrojStrana>
+    <IzdavacId>4</IzdavacId>
+  </Knjiga>
+  <Knjiga>
+    <Id>22</Id>
+    <ISBN>9788600000224</ISBN>
+    <Naziv>Ptice nad ravnicom</Naziv>
+    <Zanr>Poezija</Zanr>
+    <GodinaIzdanja>2024</GodinaIzdanja>
+    <Cena>1480.00</Cena>
+    <BrojStrana>406</BrojStrana>
+    <IzdavacId>4</IzdavacId>
+  </Knjiga>
+  <Knjiga>
+    <Id>23</Id>
+    <ISBN>9788600000231</ISBN>
+    <Naziv>Dnevnik jednog putovanja</Naziv>
+    <Zanr>Putopis</Zanr>
+    <GodinaIzdanja>2025</GodinaIzdanja>
+    <Cena>1525.00</Cena>
+    <BrojStrana>419</BrojStrana>
+    <IzdavacId>4</IzdavacId>
+  </Knjiga>
+  <Knjiga>
+    <Id>24</Id>
+    <ISBN>9788600000248</ISBN>
+    <Naziv>Odraz u jezeru</Naziv>
+    <Zanr>Misterija</Zanr>
+    <GodinaIzdanja>2014</GodinaIzdanja>
+    <Cena>1570.00</Cena>
+    <BrojStrana>432</BrojStrana>
+    <IzdavacId>4</IzdavacId>
+  </Knjiga>
+  <Knjiga>
+    <Id>25</Id>
+    <ISBN>9788600000255</ISBN>
+    <Naziv>Knjiga za test veze</Naziv>
+    <Zanr>Roman</Zanr>
+    <GodinaIzdanja>2015</GodinaIzdanja>
+    <Cena>1615.00</Cena>
+    <BrojStrana>445</BrojStrana>
+    <IzdavacId>4</IzdavacId>
+  </Knjiga>
+</ArrayOfKnjiga>

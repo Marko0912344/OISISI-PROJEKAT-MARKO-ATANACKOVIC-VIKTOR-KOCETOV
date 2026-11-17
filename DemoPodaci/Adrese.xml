@@ -1,0 +1,220 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ArrayOfAdresa xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Adresa>
+    <Id>1</Id>
+    <Ulica>Dunavska</Ulica>
+    <Broj>3</Broj>
+    <Grad>Novi Sad</Grad>
+    <Drzava>Srbija</Drzava>
+  </Adresa>
+  <Adresa>
+    <Id>2</Id>
+    <Ulica>Jovana Jovanovica Zmaja</Ulica>
+    <Broj>6</Broj>
+    <Grad>Beograd</Grad>
+    <Drzava>Srbija</Drzava>
+  </Adresa>
+  <Adresa>
+    <Id>3</Id>
+    <Ulica>Bulevar oslobodjenja</Ulica>
+    <Broj>9</Broj>
+    <Grad>Subotica</Grad>
+    <Drzava>Srbija</Drzava>
+  </Adresa>
+  <Adresa>
+    <Id>4</Id>
+    <Ulica>Vojvodjanska</Ulica>
+    <Broj>12</Broj>
+    <Grad>Sombor</Grad>
+    <Drzava>Srbija</Drzava>
+  </Adresa>
+  <Adresa>
+    <Id>5</Id>
+    <Ulica>Narodnog fronta</Ulica>
+    <Broj>15</Broj>
+    <Grad>Zrenjanin</Grad>
+    <Drzava>Srbija</Drzava>
+  </Adresa>
+  <Adresa>
+    <Id>6</Id>
+    <Ulica>Kralja Petra</Ulica>
+    <Broj>18</Broj>
+    <Grad>Kikinda</Grad>
+    <Drzava>Srbija</Drzava>
+  </Adresa>
+  <Adresa>
+    <Id>7</Id>
+    <Ulica>Zmaj Jovina</Ulica>
+    <Broj>21a</Broj>
+    <Grad>Backa Palanka</Grad>
+    <Drzava>Srbija</Drzava>
+  </Adresa>
+  <Adresa>
+    <Id>8</Id>
+    <Ulica>Svetozara Miletica</Ulica>
+    <Broj>24</Broj>
+    <Grad>Vrbas</Grad>
+    <Drzava>Srbija</Drzava>
+  </Adresa>
+  <Adresa>
+    <Id>9</Id>
+    <Ulica>Dunavska</Ulica>
+    <Broj>27</Broj>
+    <Grad>Novi Sad</Grad>
+    <Drzava>Srbija</Drzava>
+  </Adresa>
+  <Adresa>
+    <Id>10</Id>
+    <Ulica>Jovana Jovanovica Zmaja</Ulica>
+    <Broj>30</Broj>
+    <Grad>Beograd</Grad>
+    <Drzava>Srbija</Drzava>
+  </Adresa>
+  <Adresa>
+    <Id>11</Id>
+    <Ulica>Bulevar oslobodjenja</Ulica>
+    <Broj>33</Broj>
+    <Grad>Subotica</Grad>
+    <Drzava>Srbija</Drzava>
+  </Adresa>
+  <Adresa>
+    <Id>12</Id>
+    <Ulica>Vojvodjanska</Ulica>
+    <Broj>36</Broj>
+    <Grad>Sombor</Grad>
+    <Drzava>Srbija</Drzava>
+  </Adresa>
+  <Adresa>
+    <Id>13</Id>
+    <Ulica>Narodnog fronta</Ulica>
+    <Broj>39</Broj>
+    <Grad>Zrenjanin</Grad>
+    <Drzava>Srbija</Drzava>
+  </Adresa>
+  <Adresa>
+    <Id>14</Id>
+    <Ulica>Kralja Petra</Ulica>
+    <Broj>42a</Broj>
+    <Grad>Kikinda</Grad>
+    <Drzava>Srbija</Drzava>
+  </Adresa>
+  <Adresa>
+    <Id>15</Id>
+    <Ulica>Zmaj Jovina</Ulica>
+    <Broj>45</Broj>
+    <Grad>Backa Palanka</Grad>
+    <Drzava>Srbija</Drzava>
+  </Adresa>
+  <Adresa>
+    <Id>16</Id>
+    <Ulica>Svetozara Miletica</Ulica>
+    <Broj>48</Broj>
+    <Grad>Vrbas</Grad>
+    <Drzava>Srbija</Drzava>
+  </Adresa>
+  <Adresa>
+    <Id>17</Id>
+    <Ulica>Dunavska</Ulica>
+    <Broj>51</Broj>
+    <Grad>Novi Sad</Grad>
+    <Drzava>Srbija</Drzava>
+  </Adresa>
+  <Adresa>
+    <Id>18</Id>
+    <Ulica>Jovana Jovanovica Zmaja</Ulica>
+    <Broj>54</Broj>
+    <Grad>Beograd</Grad>
+    <Drzava>Srbija</Drzava>
+  </Adresa>
+  <Adresa>
+    <Id>19</Id>
+    <Ulica>Bulevar oslobodjenja</Ulica>
+    <Broj>57</Broj>
+    <Grad>Subotica</Grad>
+    <Drzava>Srbija</Drzava>
+  </Adresa>
+  <Adresa>
+    <Id>20</Id>
+    <Ulica>Vojvodjanska</Ulica>
+    <Broj>60</Broj>
+    <Grad>Sombor</Grad>
+    <Drzava>Srbija</Drzava>
+  </Adresa>
+  <Adresa>
+    <Id>21</Id>
+    <Ulica>Narodnog fronta</Ulica>
+    <Broj>63a</Broj>
+    <Grad>Zrenjanin</Grad>
+    <Drzava>Srbija</Drzava>
+  </Adresa>
+  <Adresa>
+    <Id>22</Id>
+    <Ulica>Kralja Petra</Ulica>
+    <Broj>66</Broj>
+    <Grad>Kikinda</Grad>
+    <Drzava>Srbija</Drzava>
+  </Adresa>
+  <Adresa>
+    <Id>23</Id>
+    <Ulica>Zmaj Jovina</Ulica>
+    <Broj>69</Broj>
+    <Grad>Backa Palanka</Grad>
+    <Drzava>Srbija</Drzava>
+  </Adresa>
+  <Adresa>
+    <Id>24</Id>
+    <Ulica>Svetozara Miletica</Ulica>
+    <Broj>72</Broj>
+    <Grad>Vrbas</Grad>
+    <Drzava>Srbija</Drzava>
+  </Adresa>
+  <Adresa>
+    <Id>25</Id>
+    <Ulica>Dunavska</Ulica>
+    <Broj>75</Broj>
+    <Grad>Novi Sad</Grad>
+    <Drzava>Srbija</Drzava>
+  </Adresa>
+  <Adresa>
+    <Id>26</Id>
+    <Ulica>Jovana Jovanovica Zmaja</Ulica>
+    <Broj>78</Broj>
+    <Grad>Beograd</Grad>
+    <Drzava>Srbija</Drzava>
+  </Adresa>
+  <Adresa>
+    <Id>27</Id>
+    <Ulica>Bulevar oslobodjenja</Ulica>
+    <Broj>81</Broj>
+    <Grad>Subotica</Grad>
+    <Drzava>Srbija</Drzava>
+  </Adresa>
+  <Adresa>
+    <Id>28</Id>
+    <Ulica>Vojvodjanska</Ulica>
+    <Broj>84a</Broj>
+    <Grad>Sombor</Grad>
+    <Drzava>Srbija</Drzava>
+  </Adresa>
+  <Adresa>
+    <Id>29</Id>
+    <Ulica>Narodnog fronta</Ulica>
+    <Broj>87</Broj>
+    <Grad>Zrenjanin</Grad>
+    <Drzava>Srbija</Drzava>
+  </Adresa>
+  <Adresa>
+    <Id>30</Id>
+    <Ulica>Kralja Petra</Ulica>
+    <Broj>90</Broj>
+    <Grad>Kikinda</Grad>
+    <Drzava>Srbija</Drzava>
+  </Adresa>
+  <Adresa>
+    <Id>31</Id>
+    <Ulica>Testna ulica</Ulica>
+    <Broj>999</Broj>
+    <Grad>Novi Sad</Grad>
+    <Drzava>Srbija</Drzava>
+  </Adresa>
+</ArrayOfAdresa>

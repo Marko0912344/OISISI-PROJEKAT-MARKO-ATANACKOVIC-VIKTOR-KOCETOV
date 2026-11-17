@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ArrayOfIdBrojac xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <IdBrojac>
+    <TipEntiteta>Adresa</TipEntiteta>
+    <SledeciId>32</SledeciId>
+  </IdBrojac>
+  <IdBrojac>
+    <TipEntiteta>Autor</TipEntiteta>
+    <SledeciId>23</SledeciId>
+  </IdBrojac>
+  <IdBrojac>
+    <TipEntiteta>Knjiga</TipEntiteta>
+    <SledeciId>26</SledeciId>
+  </IdBrojac>
+  <IdBrojac>
+    <TipEntiteta>Posetilac</TipEntiteta>
+    <SledeciId>9</SledeciId>
+  </IdBrojac>
+  <IdBrojac>
+    <TipEntiteta>Izdavac</TipEntiteta>
+    <SledeciId>5</SledeciId>
+  </IdBrojac>
+  <IdBrojac>
+    <TipEntiteta>Kupovina</TipEntiteta>
+    <SledeciId>12</SledeciId>
+  </IdBrojac>
+</ArrayOfIdBrojac>
