@@ -12,4 +12,8 @@ public class Knjiga : IEntitet
     public int BrojStrana { get; set; }
     public int? IzdavacId { get; set; }
     [XmlIgnore] public List<Autor> Autori { get; set; } = new();
+    // Do spajanja sa Studentom 1, posetioci se identifikuju njihovim ID-jevima.
+    // Liste se rekonstruišu iz Kupovine.xml i StavkeListeZelja.xml.
+    [XmlIgnore] public List<int> IdKupaca { get; set; } = new();
+    [XmlIgnore] public List<int> IdPosetilacaSaZeljom { get; set; } = new();
 }

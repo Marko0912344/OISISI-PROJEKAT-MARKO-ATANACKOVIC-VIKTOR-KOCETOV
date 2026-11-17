@@ -36,8 +36,8 @@ public class Student2AutoriService
         return _adrese.Obrisi(id);
     }
 
-    public List<Autor> Svi() => _autori.UcitajSve();
-    public Autor? Nadji(int id) => _autori.PronadjiPoId(id);
+    public List<Autor> Svi() => Student2PovezivanjeService.Ucitaj().Autori;
+    public Autor? Nadji(int id) => Svi().FirstOrDefault(a => a.Id == id);
 
     public Autor Dodaj(Autor autor, Adresa adresa) =>
         XmlTransakcija.Izvrsi(new[] { "Autori.xml", "Adrese.xml", "IdBrojaci.xml" }, () =>
@@ -90,21 +90,36 @@ public class Student2AutoriService
         return _autori.Obrisi(id);
     }
 
-    public List<Autor> Pretrazi(string upit)
+    public List<Autor> Pretrazi(string upit) =>
+        Filtriraj(Svi(), upit, zahtevajKriterijum: true);
+
+    public List<Autor> Sortiraj(string polje, bool opadajuce) =>
+        SortirajListu(Svi(), polje, opadajuce);
+
+    public List<Autor> Upit(string? pretraga, string polje, bool opadajuce) =>
+        SortirajListu(Filtriraj(Svi(), pretraga, false), polje, opadajuce);
+
+    public static List<Autor> Filtriraj(IEnumerable<Autor> autori,
+        string? upit, bool zahtevajKriterijum = false)
     {
+        if (string.IsNullOrWhiteSpace(upit))
+        {
+            if (zahtevajKriterijum) throw new ArgumentException("Unesi prezime ili prezime, ime.");
+            return autori.ToList();
+        }
         string[] reci = upit.Split(',', StringSplitOptions.TrimEntries);
         if (reci.Length is < 1 or > 2 || reci.Any(string.IsNullOrWhiteSpace))
             throw new ArgumentException("Unesi prezime ili prezime, ime.");
-        return Svi().Where(a =>
+        return autori.Where(a =>
             a.Prezime.Contains(reci[0], StringComparison.OrdinalIgnoreCase) &&
             (reci.Length == 1 || a.Ime.Contains(reci[1], StringComparison.OrdinalIgnoreCase)))
             .ToList();
     }
 
-    public List<Autor> Sortiraj(string polje, bool opadajuce)
+    public static List<Autor> SortirajListu(IEnumerable<Autor> autori,
+        string polje, bool opadajuce)
     {
-        var lista = Svi();
-        Func<Autor, string> kljuc = polje.ToLowerInvariant() switch
+        Func<Autor, string> kljuc = (polje ?? "").Trim().ToLowerInvariant() switch
         {
             "ime" => a => a.Ime,
             "prezime" => a => a.Prezime,
@@ -112,14 +127,14 @@ public class Student2AutoriService
             _ => throw new ArgumentException("Polje: ime, prezime ili email.")
         };
         return (opadajuce
-            ? lista.OrderByDescending(kljuc, StringComparer.CurrentCultureIgnoreCase)
-            : lista.OrderBy(kljuc, StringComparer.CurrentCultureIgnoreCase)).ToList();
+            ? autori.OrderByDescending(kljuc, StringComparer.CurrentCultureIgnoreCase)
+            : autori.OrderBy(kljuc, StringComparer.CurrentCultureIgnoreCase)).ToList();
     }
 
     private void ProveriDuplikatLK(string lk, int osimId)
     {
         if (_autori.UcitajSve().Any(a => a.Id != osimId &&
-            a.BrojLicneKarte.Equals(lk, StringComparison.OrdinalIgnoreCase)))
+            string.Equals(a.BrojLicneKarte, lk, StringComparison.OrdinalIgnoreCase)))
             throw new InvalidOperationException("Broj licne karte vec postoji.");
     }
 

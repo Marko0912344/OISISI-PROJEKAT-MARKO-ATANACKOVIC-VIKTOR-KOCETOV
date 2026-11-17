@@ -1,39 +1,72 @@
+using System.Globalization;
+using System.Xml;
 using System.Xml.Linq;
-using SajamKnjiga.Core.Persistence;
 
 namespace SajamKnjiga.Core.Services;
 
-// SAMO citanje zavisnosti iz tudjih entiteta; ne definise modele
-// Posetilac/Kupovina/Izdavac, niti menja njihove poslovne operacije.
-// Kod zajednickog spajanja sa Studentom 1 zameniti tipizovanim servisima.
+/// <summary>
+/// Most prema XML datotekama koje ce, posle integracije, tipizovano
+/// obradjivati Student 1. Ne menja njegove modele niti njegove servise.
+/// </summary>
 internal static class CitacVeza
 {
-    public static bool SefIzdavaca(int autorId) =>
-        PostojiOdgovarajucaStavka("Izdavaci.xml", "SefAutorId", autorId);
+    private static string Putanja(string naziv) =>
+        Path.Combine(AppContext.BaseDirectory, "Data", naziv);
 
-    public static bool KnjigaKupljena(int knjigaId) =>
-        PostojiOdgovarajucaStavka("Kupovine.xml", "KnjigaId", knjigaId);
-
-    public static bool PostojiPosetilac(int posetilacId) =>
-        PostojiOdgovarajucaStavka("Posetioci.xml", "Id", posetilacId);
-
-    public static bool PosetilacKoristiAdresu(int adresaId) =>
-        PostojiOdgovarajucaStavka("Posetioci.xml", "AdresaId", adresaId);
-
-    private static bool PostojiOdgovarajucaStavka(string datoteka, string polje, int id)
+    private static List<XElement> Zapisi(string datoteka)
     {
-        string putanja = Path.Combine(AppContext.BaseDirectory, "Data", datoteka);
-        if (!File.Exists(putanja)) return false;
+        var putanja = Putanja(datoteka);
+        if (!File.Exists(putanja)) return new List<XElement>();
         try
         {
             XDocument doc = XDocument.Load(putanja);
-            return doc.Root?.Elements().Any(z =>
-                z.Elements().Any(e => e.Name.LocalName == polje &&
-                    int.TryParse(e.Value, out int vrednost) && vrednost == id)) ?? false;
+            if (doc.Root is null) throw new InvalidDataException("Nema korena u " + datoteka);
+            return doc.Root.Elements().ToList();
         }
-        catch (System.Xml.XmlException ex)
+        catch (XmlException ex)
         {
-            throw new InvalidDataException("Neispravan povezani XML: " + datoteka, ex);
+            throw new InvalidDataException("Povezani XML nije ispravan: " + datoteka, ex);
         }
     }
+
+    public static int? Broj(XElement zapis, params string[] nazivi)
+    {
+        foreach (string naziv in nazivi)
+        {
+            XElement? polje = zapis.Elements().FirstOrDefault(e => e.Name.LocalName == naziv);
+            if (polje is null || string.IsNullOrWhiteSpace(polje.Value)) continue;
+            if (!int.TryParse(polje.Value, NumberStyles.Integer,
+                    CultureInfo.InvariantCulture, out int vrednost))
+                throw new InvalidDataException($"Neispravna vrednost '{naziv}' u povezanom XML-u.");
+            return vrednost;
+        }
+        return null;
+    }
+
+    public static bool SefIzdavaca(int autorId) =>
+        Zapisi("Izdavaci.xml").Any(i => Broj(i, "SefId", "SefAutorId") == autorId);
+
+    public static bool SefIzdavacaKod(int izdavacId, int autorId) =>
+        Zapisi("Izdavaci.xml").Any(i =>
+            Broj(i, "Id") == izdavacId &&
+            Broj(i, "SefId", "SefAutorId") == autorId);
+
+    public static bool PostojiIzdavac(int izdavacId) =>
+        Zapisi("Izdavaci.xml").Any(i => Broj(i, "Id") == izdavacId);
+
+    public static bool PostojiPosetilac(int posetilacId) =>
+        Zapisi("Posetioci.xml").Any(p => Broj(p, "Id") == posetilacId);
+
+    public static bool PosetilacKoristiAdresu(int adresaId) =>
+        Zapisi("Posetioci.xml").Any(p => Broj(p, "AdresaId") == adresaId);
+
+    public static bool KnjigaKupljena(int knjigaId) =>
+        Zapisi("Kupovine.xml").Any(k => Broj(k, "KnjigaId") == knjigaId);
+
+    public static List<(int PosetilacId, int KnjigaId)> Kupovine() =>
+        Zapisi("Kupovine.xml")
+            .Select(k => (PosetilacId: Broj(k, "PosetilacId") ?? 0,
+                          KnjigaId: Broj(k, "KnjigaId") ?? 0))
+            .Where(k => k.PosetilacId > 0 && k.KnjigaId > 0)
+            .ToList();
 }

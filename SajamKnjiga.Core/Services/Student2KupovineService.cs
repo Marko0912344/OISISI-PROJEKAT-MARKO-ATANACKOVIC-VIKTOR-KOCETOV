@@ -29,7 +29,7 @@ public sealed class Student2KupovineService
             throw new ArgumentException("Ocena mora biti od 1 do 5.");
 
         return XmlTransakcija.Izvrsi(
-            new[] { "Kupovine.xml", "StavkeListeZelja.xml", "IdBrojaci.xml" },
+            new[] { "Kupovine.xml", "StavkeListeZelja.xml", "IdBrojaci.xml", "Posetioci.xml" },
             () =>
             {
                 if (!CitacVeza.PostojiPosetilac(posetilacId))
@@ -83,8 +83,38 @@ public sealed class Student2KupovineService
                 _brojaci.Sacuvaj(brojaci);
                 zelje.RemoveAll(z => z.PosetilacId == posetilacId && z.KnjigaId == knjigaId);
                 _zelje.Sacuvaj(zelje);
+
+                // Prosecna ocena je izveden podatak posetioca. Azurira se
+                // zajedno sa kupovinom kako bi model ostao dosledan.
+                AzurirajProsecnuOcenu(posetilacId, root);
                 return id;
             });
+    }
+
+    private static void AzurirajProsecnuOcenu(int posetilacId, XElement kupovine)
+    {
+        string putanja = Path.Combine(AppContext.BaseDirectory, "Data", "Posetioci.xml");
+        if (!File.Exists(putanja))
+            throw new InvalidDataException("Posetioci.xml nedostaje tokom kupovine.");
+        XDocument doc = XDocument.Load(putanja);
+        XElement zapis = doc.Root?.Elements().FirstOrDefault(p =>
+            Vrednost(p, "Id") == posetilacId) ??
+            throw new InvalidDataException("Posetilac vise ne postoji u Posetioci.xml.");
+
+        var ocene = kupovine.Elements()
+            .Where(k => Vrednost(k, "PosetilacId") == posetilacId)
+            .Select(k => Vrednost(k, "Ocena"))
+            .Where(ocena => ocena >= 1 && ocena <= 5)
+            .ToList();
+        double prosek = ocene.Count == 0 ? 0 : ocene.Average();
+        XElement? polje = zapis.Elements().FirstOrDefault(e =>
+            e.Name.LocalName == "ProsecnaOcena");
+        if (polje is null)
+            zapis.Add(new XElement("ProsecnaOcena",
+                prosek.ToString("R", CultureInfo.InvariantCulture)));
+        else
+            polje.Value = prosek.ToString("R", CultureInfo.InvariantCulture);
+        SacuvajXmlBezbedno(doc, putanja);
     }
 
     private static int Vrednost(XElement zapis, string ime)
