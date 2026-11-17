@@ -1,6 +1,7 @@
 using System.Globalization;
 using SajamKnjiga.Core.Models;
 using SajamKnjiga.Core.Services;
+using SajamKnjiga.Core.Persistence;
 
 namespace SajamKnjiga.ConsoleApp;
 
@@ -13,6 +14,11 @@ public sealed class Student2Meni : IMeniModul
 
     public void Pokreni()
     {
+        // Ne menjamo zajednicki Program.cs: oporavak ide na ulazu
+        // u nas modul, pre bilo kog citanja ili izmene podataka.
+        int oporavljeni = XmlTransakcija.OporaviPrekinute();
+        if (oporavljeni > 0)
+            Console.WriteLine($"Obradjeno nedovrsenih/zavrsenih dnevnika: {oporavljeni}");
         while (true)
         {
             Console.WriteLine("\n=== STUDENT 2 / KONZOLNA APLIKACIJA ===");
@@ -27,6 +33,9 @@ public sealed class Student2Meni : IMeniModul
             Console.WriteLine("17. Autori izdavaca     18. Evidentiraj kupovinu");
             Console.WriteLine("19. Prikaz adresa       20. Dodaj adresu");
             Console.WriteLine("21. Izmeni adresu       22. Obrisi adresu");
+            Console.WriteLine("23. Upit autora (pretraga + sortiranje + strane)");
+            Console.WriteLine("24. Upit knjiga (pretraga + sortiranje + strane)");
+            Console.WriteLine("25. Detalji autora      26. Detalji knjige");
             Console.WriteLine("0. Povratak");
             Console.Write("Izbor: ");
             var izbor = Console.ReadLine()?.Trim();
@@ -49,20 +58,90 @@ public sealed class Student2Meni : IMeniModul
                     case "12": Console.WriteLine(_knjige.UkloniAutora(Broj("Autor ID: "), Broj("Knjiga ID: ")) ? "Veza uklonjena." : "Veza ne postoji."); break;
                     case "13": IspisiKnjige(_knjige.ListaZelja(Broj("Posetilac ID: "))); break;
                     case "14": UkloniZelju(); break;
-                    case "15": IspisiAutore(_knjige.AutoriZaZelje(Broj("Posetilac ID: "))); break;
+                    case "15": PretraziAutoreIzZelja(); break;
                     case "16": IspisiKnjige(_knjige.KnjigeIzdavaca(Broj("Izdavac ID: "))); break;
-                    case "17": IspisiAutore(_knjige.AutoriIzdavaca(Broj("Izdavac ID: "))); break;
+                    case "17": PretraziAutoreIzdavaca(); break;
                     case "18": EvidentirajKupovinu(); break;
                     case "19": PrikaziStrane(_autori.SveAdrese(), a => $"{a.Id,4} | {a.Ulica} {a.Broj}, {a.Grad}, {a.Drzava}"); break;
                     case "20": DodajAdresu(); break;
                     case "21": IzmeniAdresu(); break;
                     case "22": Console.WriteLine(_autori.ObrisiAdresu(Broj("ID adrese: ")) ? "Obrisana." : "Ne postoji."); break;
+                    case "23": UpitAutora(); break;
+                    case "24": UpitKnjiga(); break;
+                    case "25": DetaljiAutora(); break;
+                    case "26": DetaljiKnjige(); break;
                     default: Console.WriteLine("Nepoznata opcija."); break;
                 }
             }
             catch (Exception e) { Console.WriteLine("Operacija nije izvrsena: " + e.Message); }
             Console.Write("Enter za nastavak..."); Console.ReadLine();
         }
+    }
+
+    private void DetaljiAutora()
+    {
+        Autor a = _autori.Nadji(Broj("Autor ID: ")) ??
+            throw new InvalidOperationException("Autor ne postoji.");
+        Console.WriteLine($"ID: {a.Id} | {a.Ime} {a.Prezime}");
+        Console.WriteLine($"Datum rodjenja: {a.DatumRodjenja:dd.MM.yyyy}");
+        Console.WriteLine($"Adresa: {a.Adresa} (ID: {a.AdresaId})");
+        Console.WriteLine($"Telefon: {a.Telefon} | Email: {a.Email}");
+        Console.WriteLine($"Broj LK: {a.BrojLicneKarte} | Iskustvo: {a.GodineIskustva}");
+        Console.WriteLine("Knjige: " + (a.Knjige.Count == 0
+            ? "nema" : string.Join(", ", a.Knjige.Select(k => $"{k.Id}: {k.Naziv}"))));
+    }
+
+    private void DetaljiKnjige()
+    {
+        Knjiga k = _knjige.Nadji(Broj("Knjiga ID: ")) ??
+            throw new InvalidOperationException("Knjiga ne postoji.");
+        Console.WriteLine($"ID: {k.Id} | ISBN: {k.ISBN} | Naziv: {k.Naziv}");
+        Console.WriteLine($"Zanr: {k.Zanr} | Izdanje: {k.GodinaIzdanja} | " +
+            $"Cena: {k.Cena} | Broj strana: {k.BrojStrana}");
+        Console.WriteLine("Izdavac ID: " + (k.IzdavacId?.ToString() ?? "nije dodeljen"));
+        Console.WriteLine("Autori: " + (k.Autori.Count == 0 ? "nema" :
+            string.Join(", ", k.Autori.Select(a => $"{a.Id}: {a.Ime} {a.Prezime}"))));
+        Console.WriteLine("ID kupaca: " + (k.IdKupaca.Count == 0 ? "nema" :
+            string.Join(", ", k.IdKupaca)));
+        Console.WriteLine("ID posetilaca sa zeljom: " +
+            (k.IdPosetilacaSaZeljom.Count == 0 ? "nema" :
+                string.Join(", ", k.IdPosetilacaSaZeljom)));
+    }
+
+    private void UpitAutora()
+    {
+        Console.Write("Pretraga autora (prazno = svi; prezime ili prezime, ime): ");
+        string? pretraga = Console.ReadLine();
+        string polje = Tekst("Sortiranje (ime/prezime/email): ");
+        bool opadajuce = DaNe("Opadajuce (d/n): ");
+        IspisiAutore(_autori.Upit(pretraga, polje, opadajuce));
+    }
+
+    private void UpitKnjiga()
+    {
+        Console.Write("Pretraga knjiga (prazno = sve; naziv ili ISBN): ");
+        string? pretraga = Console.ReadLine();
+        string polje = Tekst("Sortiranje (isbn/naziv/cena/godina/zanr): ");
+        bool opadajuce = DaNe("Opadajuce (d/n): ");
+        IspisiKnjige(_knjige.Upit(pretraga, polje, opadajuce));
+    }
+
+    private void PretraziAutoreIzZelja()
+    {
+        int posetilacId = Broj("Posetilac ID: ");
+        Console.Write("Pretraga rezultata (prazno = svi; prezime ili prezime, ime): ");
+        string? pretraga = Console.ReadLine();
+        IspisiAutore(_knjige.PretraziAutoreZaZelje(posetilacId, pretraga));
+    }
+
+    private void PretraziAutoreIzdavaca()
+    {
+        int izdavacId = Broj("Izdavac ID: ");
+        Console.Write("Pretraga rezultata (prazno = svi; prezime ili prezime, ime): ");
+        string? pretraga = Console.ReadLine();
+        PrikaziStrane(_knjige.PretraziAutoreIzdavaca(izdavacId, pretraga),
+            a => $"{a.Ime} {a.Prezime} | {a.DatumRodjenja:dd.MM.yyyy} | " +
+                 $"{a.Adresa} | {a.Telefon} | {a.Email}");
     }
 
     private void DodajAdresu()
@@ -151,6 +230,9 @@ public sealed class Student2Meni : IMeniModul
         int p = Broj("Posetilac ID: ");
         IspisiKnjige(_knjige.ListaZelja(p));
         int k = Broj("Knjiga ID sa liste zelja: ");
+        Knjiga odabrana = _knjige.Nadji(k) ??
+            throw new InvalidOperationException("Knjiga ne postoji.");
+        Console.WriteLine($"Izabrana knjiga: {odabrana.ISBN} - {odabrana.Naziv}");
         DateTime datum = Datum("Datum kupovine (dd.MM.yyyy): ");
         int ocena = Broj("Ocena (1-5): ");
         if (ocena > 5) throw new ArgumentException("Ocena mora biti 1-5.");
