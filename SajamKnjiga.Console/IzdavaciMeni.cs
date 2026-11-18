@@ -35,6 +35,7 @@ public class IzdavaciMeni : IMeniModul
             System.Console.WriteLine("4. Obrisi izdavaca");
             System.Console.WriteLine("5. Postavi sefa izdavaca");
             System.Console.WriteLine("6. Dodaj autora");
+            System.Console.WriteLine("7. Povezi autora sa izdavacem");
             System.Console.WriteLine("0. Povratak");
 
             System.Console.Write("Izbor: ");
@@ -62,6 +63,9 @@ public class IzdavaciMeni : IMeniModul
                     break;
                 case "0":
                     return;
+                case "7":
+                    PoveziAutora();
+                    break;
                 default:
                     System.Console.WriteLine("Nepostojeca opcija.");
                     break;
@@ -305,6 +309,47 @@ public class IzdavaciMeni : IMeniModul
         {
             autorServis.Dodaj(autor);
             System.Console.WriteLine("Autor je uspesno dodat.");
+        }
+        catch (InvalidOperationException ex)
+        {
+            System.Console.WriteLine(ex.Message);
+        }
+    }
+
+    private void PoveziAutora()
+    {
+        System.Console.Write("ID izdavaca: ");
+
+        if (!int.TryParse(System.Console.ReadLine(), out int izdavacId)
+            || izdavacId <= 0)
+        {
+            System.Console.WriteLine("Neispravan ID izdavaca.");
+            return;
+        }
+
+        System.Console.Write("ID autora: ");
+
+        if (!int.TryParse(System.Console.ReadLine(), out int autorId)
+            || autorId <= 0)
+        {
+            System.Console.WriteLine("Neispravan ID autora.");
+            return;
+        }
+
+        string putanja = Path.Combine(
+            AppContext.BaseDirectory,
+            "Podaci",
+            "autori.xml"
+        );
+
+        AutorServis autorServis = new AutorServis(putanja);
+
+        try
+        {
+            _servis.PoveziAutora(izdavacId, autorId, autorServis);
+
+            System.Console.WriteLine(
+                "Autor je uspesno povezan sa izdavacem.");
         }
         catch (InvalidOperationException ex)
         {

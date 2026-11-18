@@ -98,4 +98,34 @@ public class IzdavacServis
         return true;
     }
 
+    public bool PoveziAutora(int izdavacId, int autorId, AutorServis autorServis)
+    {
+        Izdavac? izdavac = _izdavaci
+            .FirstOrDefault(i => i.Id == izdavacId);
+
+        if (izdavac == null)
+        {
+            throw new InvalidOperationException("Izdavac ne postoji.");
+        }
+
+        Autor? autor = autorServis.PronadjiPoId(autorId);
+
+        if (autor == null)
+        {
+            throw new InvalidOperationException("Autor ne postoji.");
+        }
+
+        if (izdavac.AutorIds.Contains(autorId))
+        {
+            throw new InvalidOperationException(
+                "Autor je vec povezan sa ovim izdavacem.");
+        }
+
+        izdavac.AutorIds.Add(autorId);
+
+        _skladiste.Sacuvaj(_izdavaci);
+
+        return true;
+    }
+
 }
