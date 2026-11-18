@@ -570,7 +570,18 @@ public class PosetiociMeni : IMeniModul
 
         int adresaId = posetilac.AdresaId;
 
-        bool obrisan = _servis.Obrisi(id);
+        bool obrisan;
+
+        try
+        {
+            obrisan = _servis.Obrisi(id, kupovinaServis);
+        }
+        catch (InvalidOperationException ex)
+        {
+            System.Console.WriteLine(ex.Message);
+            return;
+        }
+
 
         if (!obrisan)
         {

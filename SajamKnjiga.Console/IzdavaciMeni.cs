@@ -101,9 +101,10 @@ public class IzdavaciMeni : IMeniModul
     {
         System.Console.Write("ID izdavaca: ");
 
-        if (!int.TryParse(System.Console.ReadLine(), out int id))
+
+        if (!int.TryParse(System.Console.ReadLine(), out int id) || id <= 0)
         {
-            System.Console.WriteLine("Neispravan ID.");
+            System.Console.WriteLine("ID mora biti pozitivan broj.");
             return;
         }
 
@@ -116,10 +117,74 @@ public class IzdavaciMeni : IMeniModul
             return;
         }
 
+        System.Console.Write("ID šefa izdavača (Enter ako nema): ");
+        string unosSefa = System.Console.ReadLine() ?? "";
+
+        int? sefId = null;
+
+        if (!string.IsNullOrWhiteSpace(unosSefa))
+        {
+            if (!int.TryParse(unosSefa, out int idSefa) || idSefa <= 0)
+            {
+                System.Console.WriteLine("Neispravan ID šefa.");
+                return;
+            }
+
+            sefId = idSefa;
+        }
+
+        List<int> autorIds = new List<int>();
+
+        System.Console.Write("ID-jevi autora (odvojeni zarezom, Enter ako nema): ");
+        string unosAutora = System.Console.ReadLine() ?? "";
+
+        if (!string.IsNullOrWhiteSpace(unosAutora))
+        {
+            foreach (string deo in unosAutora.Split(','))
+            {
+                if (!int.TryParse(deo.Trim(), out int autorId) || autorId <= 0)
+                {
+                    System.Console.WriteLine("Neispravan ID autora.");
+                    return;
+                }
+
+                if (!autorIds.Contains(autorId))
+                    autorIds.Add(autorId);
+            }
+        }
+
+
+        string putanjaAutori = Path.Combine(
+            AppContext.BaseDirectory,
+            "Podaci",
+            "autori.xml"
+        );
+
+        AutorServis autorServis = new AutorServis(putanjaAutori);
+
+        if (sefId.HasValue && !autorServis.MozeBitiSef(sefId.Value))
+        {
+            System.Console.WriteLine(
+                "Sef mora biti postojeci autor sa najmanje 5 godina iskustva.");
+            return;
+        }
+
+        foreach (int autorId in autorIds)
+        {
+            if (autorServis.PronadjiPoId(autorId) == null)
+            {
+                System.Console.WriteLine(
+                    $"Autor sa ID-jem {autorId} ne postoji.");
+                return;
+            }
+        }
+
         Izdavac novi = new Izdavac
         {
             Id = id,
-            Naziv = naziv
+            Naziv = naziv,
+            SefId = sefId,
+            AutorIds = autorIds
         };
 
         try

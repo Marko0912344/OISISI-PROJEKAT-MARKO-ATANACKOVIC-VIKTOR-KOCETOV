@@ -72,10 +72,10 @@ public class KupovinaServis
                 "Ocena mora biti izmedju 1 i 5.");
         }
 
+
         postojeca.Ocena = izmenjenaKupovina.Ocena;
         postojeca.Komentar = izmenjenaKupovina.Komentar;
-        postojeca.Ocena = izmenjenaKupovina.Ocena;
-        postojeca.Komentar = izmenjenaKupovina.Komentar;
+
 
         _skladiste.Sacuvaj(_kupovine);
 

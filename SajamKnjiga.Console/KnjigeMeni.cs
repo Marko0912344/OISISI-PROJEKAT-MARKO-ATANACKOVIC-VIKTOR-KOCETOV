@@ -1,13 +1,15 @@
 ﻿using SajamKnjiga.Core.Services;
-
+using System.IO;
 namespace SajamKnjiga.ConsoleApp;
 
 public class KnjigeMeni : IMeniModul
 {
     public string Naziv => "Knjige";
 
+
     private readonly KnjigaServis _servis =
-        new KnjigaServis("Podaci/knjige.xml");
+        new KnjigaServis(
+            Path.Combine("Podaci", "knjige.xml"));
 
     public void Pokreni()
     {

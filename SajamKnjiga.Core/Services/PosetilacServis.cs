@@ -52,7 +52,8 @@ public class PosetilacServis
         _skladiste.Sacuvaj(_posetioci);
     }
 
-    public bool Obrisi(int id)
+
+    public bool Obrisi(int id, KupovinaServis kupovinaServis)
     {
         Posetilac? posetilac =
             _posetioci.FirstOrDefault(p => p.Id == id);
@@ -60,11 +61,13 @@ public class PosetilacServis
         if (posetilac == null)
             return false;
 
+
         _posetioci.Remove(posetilac);
         _skladiste.Sacuvaj(_posetioci);
 
         return true;
     }
+
 
 
     public bool Izmeni(Posetilac izmenjeni)

@@ -23,8 +23,21 @@ public class IzdavacServis
         return new List<Izdavac>(_izdavaci);
     }
 
+
     public void Dodaj(Izdavac izdavac)
     {
+        if (izdavac.Id <= 0)
+        {
+            throw new InvalidOperationException(
+                "ID izdavaca mora biti pozitivan broj.");
+        }
+
+        if (string.IsNullOrWhiteSpace(izdavac.Naziv))
+        {
+            throw new InvalidOperationException(
+                "Naziv izdavaca je obavezan.");
+        }
+
         if (_izdavaci.Any(i => i.Id == izdavac.Id))
         {
             throw new InvalidOperationException(
@@ -43,8 +56,9 @@ public class IzdavacServis
         if (postojeci == null)
             return false;
 
-        int indeks = _izdavaci.IndexOf(postojeci);
-        _izdavaci[indeks] = izmenjeni;
+        postojeci.Naziv = izmenjeni.Naziv;
+        postojeci.SefId = izmenjeni.SefId;
+        postojeci.AutorIds = new List<int>(izmenjeni.AutorIds);
 
         _skladiste.Sacuvaj(_izdavaci);
 
