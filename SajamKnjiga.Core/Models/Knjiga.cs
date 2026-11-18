@@ -12,4 +12,12 @@ public class Knjiga : IEntitet
     public int BrojStrana { get; set; }
     public int? IzdavacId { get; set; }
     [XmlIgnore] public List<Autor> Autori { get; set; } = new();
+
+    // Liste kupaca i posetilaca koji imaju knjigu na listi zelja.
+    // Podaci se rekonstruisu iz kupovina i liste zelja.
+    [XmlIgnore]
+    public List<int> IdKupaca { get; set; } = new();
+
+    [XmlIgnore]
+    public List<int> IdPosetilacaSaZeljom { get; set; } = new();
 }

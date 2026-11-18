@@ -1,0 +1,91 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ArrayOfKupovina xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Kupovina>
+    <Id>1</Id>
+    <PosetilacId>1</PosetilacId>
+    <KnjigaId>1</KnjigaId>
+    <DatumKupovine>2026-05-04T11:30:00</DatumKupovine>
+    <Ocena>5</Ocena>
+    <Komentar>Demo komentar 1: ocena 5/5.</Komentar>
+  </Kupovina>
+  <Kupovina>
+    <Id>2</Id>
+    <PosetilacId>1</PosetilacId>
+    <KnjigaId>3</KnjigaId>
+    <DatumKupovine>2026-06-05T11:30:00</DatumKupovine>
+    <Ocena>4</Ocena>
+    <Komentar>Demo komentar 2: ocena 4/5.</Komentar>
+  </Kupovina>
+  <Kupovina>
+    <Id>3</Id>
+    <PosetilacId>2</PosetilacId>
+    <KnjigaId>2</KnjigaId>
+    <DatumKupovine>2026-07-06T11:30:00</DatumKupovine>
+    <Ocena>3</Ocena>
+    <Komentar>Demo komentar 3: ocena 3/5.</Komentar>
+  </Kupovina>
+  <Kupovina>
+    <Id>4</Id>
+    <PosetilacId>2</PosetilacId>
+    <KnjigaId>8</KnjigaId>
+    <DatumKupovine>2026-08-07T11:30:00</DatumKupovine>
+    <Ocena>5</Ocena>
+    <Komentar>Demo komentar 4: ocena 5/5.</Komentar>
+  </Kupovina>
+  <Kupovina>
+    <Id>5</Id>
+    <PosetilacId>3</PosetilacId>
+    <KnjigaId>7</KnjigaId>
+    <DatumKupovine>2026-09-08T11:30:00</DatumKupovine>
+    <Ocena>4</Ocena>
+    <Komentar>Demo komentar 5: ocena 4/5.</Komentar>
+  </Kupovina>
+  <Kupovina>
+    <Id>6</Id>
+    <PosetilacId>4</PosetilacId>
+    <KnjigaId>10</KnjigaId>
+    <DatumKupovine>2026-04-09T11:30:00</DatumKupovine>
+    <Ocena>5</Ocena>
+    <Komentar>Demo komentar 6: ocena 5/5.</Komentar>
+  </Kupovina>
+  <Kupovina>
+    <Id>7</Id>
+    <PosetilacId>5</PosetilacId>
+    <KnjigaId>15</KnjigaId>
+    <DatumKupovine>2026-05-10T11:30:00</DatumKupovine>
+    <Ocena>4</Ocena>
+    <Komentar>Demo komentar 7: ocena 4/5.</Komentar>
+  </Kupovina>
+  <Kupovina>
+    <Id>8</Id>
+    <PosetilacId>6</PosetilacId>
+    <KnjigaId>14</KnjigaId>
+    <DatumKupovine>2026-06-11T11:30:00</DatumKupovine>
+    <Ocena>2</Ocena>
+    <Komentar>Demo komentar 8: ocena 2/5.</Komentar>
+  </Kupovina>
+  <Kupovina>
+    <Id>9</Id>
+    <PosetilacId>7</PosetilacId>
+    <KnjigaId>17</KnjigaId>
+    <DatumKupovine>2026-07-12T11:30:00</DatumKupovine>
+    <Ocena>5</Ocena>
+    <Komentar>Demo komentar 9: ocena 5/5.</Komentar>
+  </Kupovina>
+  <Kupovina>
+    <Id>10</Id>
+    <PosetilacId>8</PosetilacId>
+    <KnjigaId>19</KnjigaId>
+    <DatumKupovine>2026-08-13T11:30:00</DatumKupovine>
+    <Ocena>3</Ocena>
+    <Komentar>Demo komentar 10: ocena 3/5.</Komentar>
+  </Kupovina>
+  <Kupovina>
+    <Id>11</Id>
+    <PosetilacId>8</PosetilacId>
+    <KnjigaId>20</KnjigaId>
+    <DatumKupovine>2026-09-14T11:30:00</DatumKupovine>
+    <Ocena>4</Ocena>
+    <Komentar>Demo komentar 11: ocena 4/5.</Komentar>
+  </Kupovina>
+</ArrayOfKupovina>
