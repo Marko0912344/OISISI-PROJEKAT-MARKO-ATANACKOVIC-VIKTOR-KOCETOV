@@ -9,7 +9,13 @@ public class KnjigeMeni : IMeniModul
 
     private readonly KnjigaServis _servis =
         new KnjigaServis(
-            Path.Combine("Podaci", "knjige.xml"));
+            Path.Combine(
+                AppContext.BaseDirectory,
+                "Podaci",
+                "knjige.xml"
+            )
+        );
+
 
     public void Pokreni()
     {
