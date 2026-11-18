@@ -12,6 +12,8 @@ public class Izdavac : IEntitet
 
     public int? SefId { get; set; }
 
+    public List<int> AutorIds { get; set; } = new();
+
     [XmlIgnore]
     public Autor? Sef { get; set; }
 

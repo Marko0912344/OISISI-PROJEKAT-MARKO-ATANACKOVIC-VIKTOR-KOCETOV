@@ -47,4 +47,48 @@ public class KupovinaServis
         _kupovine.Add(kupovina);
         _skladiste.Sacuvaj(_kupovine);
     }
+
+    public bool Izmeni(Kupovina izmenjenaKupovina)
+    {
+        Kupovina? postojeca = _kupovine
+            .FirstOrDefault(k => k.Id == izmenjenaKupovina.Id);
+
+        if (postojeca == null)
+        {
+            return false;
+        }
+
+        if (izmenjenaKupovina.Ocena < 1 || izmenjenaKupovina.Ocena > 5)
+        {
+            throw new InvalidOperationException(
+                "Ocena mora biti izmedju 1 i 5.");
+        }
+
+        postojeca.PosetilacId = izmenjenaKupovina.PosetilacId;
+        postojeca.KnjigaId = izmenjenaKupovina.KnjigaId;
+        postojeca.DatumKupovine = izmenjenaKupovina.DatumKupovine;
+        postojeca.Ocena = izmenjenaKupovina.Ocena;
+        postojeca.Komentar = izmenjenaKupovina.Komentar;
+
+        _skladiste.Sacuvaj(_kupovine);
+
+        return true;
+    }
+
+    public bool Obrisi(int id)
+    {
+        Kupovina? kupovina = _kupovine
+            .FirstOrDefault(k => k.Id == id);
+
+        if (kupovina == null)
+        {
+            return false;
+        }
+
+        _kupovine.Remove(kupovina);
+        _skladiste.Sacuvaj(_kupovine);
+
+        return true;
+    }
+
 }

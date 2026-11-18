@@ -4,6 +4,7 @@ using SajamKnjiga.Core.Models;
 using SajamKnjiga.Core.Services;
 using System;
 using System.IO;
+using System.Linq; 
 using static SajamKnjiga.Core.Models.Posetilac;
 
 namespace SajamKnjiga.ConsoleApp;
@@ -62,6 +63,7 @@ public class PosetiociMeni : IMeniModul
         }
     }
 
+
     private void Prikazi()
     {
         var posetioci = _servis.PrikaziSve();
@@ -72,13 +74,66 @@ public class PosetiociMeni : IMeniModul
             return;
         }
 
+        string putanjaAdrese = Path.Combine(
+            AppContext.BaseDirectory,
+            "Podaci",
+            "adrese.xml"
+        );
+
+        AdresaServis adresaServis = new AdresaServis(putanjaAdrese);
+        var adrese = adresaServis.PrikaziSve();
+
         foreach (var p in posetioci)
         {
-            System.Console.WriteLine(
-                $"{p.Id} - {p.Ime} {p.Prezime} | {p.Email} | {p.Status}"
+            Adresa? adresa = adrese
+                .FirstOrDefault(a => a.Id == p.AdresaId);
+
+            System.Console.WriteLine("------------------------------");
+            System.Console.WriteLine($"ID: {p.Id}");
+            System.Console.WriteLine($"Ime: {p.Ime}");
+            System.Console.WriteLine($"Prezime: {p.Prezime}");
+            System.Console.WriteLine($"Datum rodjenja: {p.DatumRodjenja:dd.MM.yyyy}");
+            System.Console.WriteLine($"Telefon: {p.Telefon}");
+            System.Console.WriteLine($"Email: {p.Email}");
+            System.Console.WriteLine($"Broj clanske karte: {p.BrojClanskeKarte}");
+            System.Console.WriteLine($"Godina clanstva: {p.GodinaClanstva}");
+            System.Console.WriteLine($"Status: {p.Status}");
+
+            string putanjaKupovine = Path.Combine(
+                AppContext.BaseDirectory,
+                "Podaci",
+                "kupovine.xml"
             );
+
+            KupovinaServis kupovinaServis =
+                new KupovinaServis(putanjaKupovine);
+
+            var kupovine = kupovinaServis.KupovinePosetioca(p.Id);
+
+            if (kupovine.Count > 0)
+            {
+                double prosecnaOcena = kupovine.Average(k => k.Ocena);
+                System.Console.WriteLine($"Prosecna ocena: {prosecnaOcena:F2}");
+            }
+            else
+            {
+                System.Console.WriteLine("Prosecna ocena: Nema ocena");
+            }
+
+
+            if (adresa != null)
+            {
+                System.Console.WriteLine($"Adresa: {adresa}");
+            }
+            else
+            {
+                System.Console.WriteLine("Adresa: Nije uneta");
+            }
         }
+
+        System.Console.WriteLine("------------------------------");
     }
+
 
 
 
@@ -163,6 +218,49 @@ public class PosetiociMeni : IMeniModul
             return;
         }
 
+        System.Console.Write("Ulica: ");
+        string ulica = System.Console.ReadLine() ?? "";
+
+        System.Console.Write("Broj: ");
+        string broj = System.Console.ReadLine() ?? "";
+
+        System.Console.Write("Grad: ");
+        string grad = System.Console.ReadLine() ?? "";
+
+        System.Console.Write("Drzava: ");
+        string drzava = System.Console.ReadLine() ?? "";
+
+        if (string.IsNullOrWhiteSpace(ulica) ||
+            string.IsNullOrWhiteSpace(broj) ||
+            string.IsNullOrWhiteSpace(grad) ||
+            string.IsNullOrWhiteSpace(drzava))
+        {
+            System.Console.WriteLine("Svi podaci adrese su obavezni.");
+            return;
+        }
+
+        string putanjaAdrese = Path.Combine(
+            AppContext.BaseDirectory,
+            "Podaci",
+            "adrese.xml"
+        );
+
+        AdresaServis adresaServis = new AdresaServis(putanjaAdrese);
+
+        int noviAdresaId = adresaServis.PrikaziSve()
+            .Select(a => a.Id)
+            .DefaultIfEmpty(0)
+            .Max() + 1;
+
+        Adresa novaAdresa = new Adresa
+        {
+            Id = noviAdresaId,
+            Ulica = ulica,
+            Broj = broj,
+            Grad = grad,
+            Drzava = drzava
+        };
+
         Posetilac novi = new Posetilac
         {
             Id = id,
@@ -174,19 +272,34 @@ public class PosetiociMeni : IMeniModul
             BrojClanskeKarte = brojKarte,
             GodinaClanstva = godina,
             Status = statusUnos == "V"
-                ? StatusPosetioca.VIP
-                : StatusPosetioca.Redovan
+            ? StatusPosetioca.VIP
+            : StatusPosetioca.Redovan,
+
+            AdresaId = novaAdresa.Id,
+            Adresa = novaAdresa
         };
+
 
         try
         {
+            if (_servis.PrikaziSve().Any(p => p.Id == novi.Id))
+            {
+                System.Console.WriteLine(
+                    "Posetilac sa ovim ID-jem vec postoji.");
+                return;
+            }
+
+            adresaServis.Dodaj(novaAdresa);
             _servis.Dodaj(novi);
-            System.Console.WriteLine("Posetilac je uspesno dodat.");
+
+            System.Console.WriteLine(
+                "Posetilac i njegova adresa su uspesno dodati.");
         }
         catch (InvalidOperationException ex)
         {
             System.Console.WriteLine(ex.Message);
         }
+
     }
 
 
@@ -250,6 +363,13 @@ public class PosetiociMeni : IMeniModul
                 return;
             }
 
+            if (datum.Date > DateTime.Today)
+            {
+                System.Console.WriteLine(
+                    "Datum rodjenja ne moze biti u buducnosti.");
+                return;
+            }
+
             postojeci.DatumRodjenja = datum;
         }
 
@@ -270,6 +390,13 @@ public class PosetiociMeni : IMeniModul
             if (!int.TryParse(godinaUnos, out int godina))
             {
                 System.Console.WriteLine("Neispravna godina.");
+                return;
+            }
+
+            if (godina < 1900 || godina > DateTime.Now.Year)
+            {
+                System.Console.WriteLine(
+                    "Godina clanstva nije ispravna.");
                 return;
             }
 
@@ -294,20 +421,186 @@ public class PosetiociMeni : IMeniModul
 
         if (_servis.Izmeni(postojeci))
             System.Console.WriteLine("Podaci su uspesno izmenjeni.");
+
+
+        string putanjaAdrese = Path.Combine(
+            AppContext.BaseDirectory,
+            "Podaci",
+            "adrese.xml"
+        );
+
+        AdresaServis adresaServis = new AdresaServis(putanjaAdrese);
+
+        Adresa? postojecaAdresa = adresaServis.PrikaziSve()
+            .FirstOrDefault(a => a.Id == postojeci.AdresaId);
+
+        if (postojecaAdresa != null)
+        {
+            System.Console.WriteLine("Izmena adrese (Enter za zadrzavanje):");
+
+            System.Console.Write($"Ulica ({postojecaAdresa.Ulica}): ");
+            string ulica = System.Console.ReadLine() ?? "";
+
+            System.Console.Write($"Broj ({postojecaAdresa.Broj}): ");
+            string broj = System.Console.ReadLine() ?? "";
+
+            System.Console.Write($"Grad ({postojecaAdresa.Grad}): ");
+            string grad = System.Console.ReadLine() ?? "";
+
+            System.Console.Write($"Drzava ({postojecaAdresa.Drzava}): ");
+            string drzava = System.Console.ReadLine() ?? "";
+
+            Adresa izmenjenaAdresa = new Adresa
+            {
+                Id = postojecaAdresa.Id,
+                Ulica = string.IsNullOrWhiteSpace(ulica)
+                    ? postojecaAdresa.Ulica : ulica,
+                Broj = string.IsNullOrWhiteSpace(broj)
+                    ? postojecaAdresa.Broj : broj,
+                Grad = string.IsNullOrWhiteSpace(grad)
+                    ? postojecaAdresa.Grad : grad,
+                Drzava = string.IsNullOrWhiteSpace(drzava)
+                    ? postojecaAdresa.Drzava : drzava
+            };
+
+            adresaServis.Izmeni(izmenjenaAdresa);
+        }
+
+        else
+        {
+            System.Console.WriteLine(
+                "Posetilac nema adresu. Da li zelis da je dodas? (D/N)");
+
+            string odgovor = (System.Console.ReadLine() ?? "")
+                .Trim().ToUpperInvariant();
+
+            if (odgovor == "D")
+            {
+                System.Console.Write("Ulica: ");
+                string ulica = System.Console.ReadLine() ?? "";
+
+                System.Console.Write("Broj: ");
+                string broj = System.Console.ReadLine() ?? "";
+
+                System.Console.Write("Grad: ");
+                string grad = System.Console.ReadLine() ?? "";
+
+                System.Console.Write("Drzava: ");
+                string drzava = System.Console.ReadLine() ?? "";
+
+                if (string.IsNullOrWhiteSpace(ulica) ||
+                    string.IsNullOrWhiteSpace(broj) ||
+                    string.IsNullOrWhiteSpace(grad) ||
+                    string.IsNullOrWhiteSpace(drzava))
+                {
+                    System.Console.WriteLine(
+                        "Svi podaci adrese su obavezni.");
+                    return;
+                }
+
+                int noviId = adresaServis.PrikaziSve()
+                    .Select(a => a.Id)
+                    .DefaultIfEmpty(0)
+                    .Max() + 1;
+
+                Adresa novaAdresa = new Adresa
+                {
+                    Id = noviId,
+                    Ulica = ulica,
+                    Broj = broj,
+                    Grad = grad,
+                    Drzava = drzava
+                };
+
+                adresaServis.Dodaj(novaAdresa);
+
+                postojeci.AdresaId = novaAdresa.Id;
+                postojeci.Adresa = novaAdresa;
+
+                _servis.Izmeni(postojeci);
+            }
+        }
+
+
     }
 
     private void Obrisi()
     {
         System.Console.Write("ID posetioca: ");
-        if (!int.TryParse(System.Console.ReadLine(), out int id))
+
+        if (!int.TryParse(System.Console.ReadLine(), out int id) || id <= 0)
         {
             System.Console.WriteLine("Neispravan ID.");
             return;
         }
 
-        if (_servis.Obrisi(id))
-            System.Console.WriteLine("Posetilac je obrisan.");
-        else
+        Posetilac? posetilac = _servis.PrikaziSve()
+            .FirstOrDefault(p => p.Id == id);
+
+        if (posetilac == null)
+        {
             System.Console.WriteLine("Posetilac nije pronadjen.");
+            return;
+        }
+
+        System.Console.Write("Da li sigurno zelis da obrises posetioca? (D/N): ");
+        string odgovor = (System.Console.ReadLine() ?? "")
+            .Trim().ToUpperInvariant();
+
+        if (odgovor != "D")
+        {
+            System.Console.WriteLine("Brisanje je otkazano.");
+            return;
+        }
+
+        string putanjaKupovine = Path.Combine(
+            AppContext.BaseDirectory,
+            "Podaci",
+            "kupovine.xml"
+        );
+
+        KupovinaServis kupovinaServis =
+            new KupovinaServis(putanjaKupovine);
+
+        if (kupovinaServis.KupovinePosetioca(id).Any())
+        {
+            System.Console.WriteLine(
+                "Posetilac ima evidentirane kupovine i ne moze biti obrisan.");
+            return;
+        }
+
+        int adresaId = posetilac.AdresaId;
+
+        bool obrisan = _servis.Obrisi(id);
+
+        if (!obrisan)
+        {
+            System.Console.WriteLine("Brisanje nije uspelo.");
+            return;
+        }
+
+        if (adresaId > 0)
+        {
+            bool koristiDrugi = _servis.PrikaziSve()
+                .Any(p => p.AdresaId == adresaId);
+
+            if (!koristiDrugi)
+            {
+                string putanjaAdrese = Path.Combine(
+                    AppContext.BaseDirectory,
+                    "Podaci",
+                    "adrese.xml"
+                );
+
+                AdresaServis adresaServis =
+                    new AdresaServis(putanjaAdrese);
+
+                adresaServis.Obrisi(adresaId);
+            }
+        }
+
+        System.Console.WriteLine("Posetilac je obrisan.");
     }
+
+
 }

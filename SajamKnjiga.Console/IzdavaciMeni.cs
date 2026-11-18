@@ -1,6 +1,7 @@
 ﻿
 using System;
 using System.IO;
+using System.Runtime.Intrinsics.Arm;
 using SajamKnjiga.Core.Models;
 using SajamKnjiga.Core.Services;
 
@@ -124,11 +125,11 @@ public class IzdavaciMeni : IMeniModul
 
     private void Izmeni()
     {
-        System.Console.Write("ID izdavaca: ");
+        Console.Write("ID izdavaca: ");
 
-        if (!int.TryParse(System.Console.ReadLine(), out int id))
+        if (!int.TryParse(Console.ReadLine(), out int id) || id <= 0)
         {
-            System.Console.WriteLine("Neispravan ID.");
+            Console.WriteLine("Neispravan ID.");
             return;
         }
 
@@ -137,42 +138,77 @@ public class IzdavaciMeni : IMeniModul
 
         if (postojeci == null)
         {
-            System.Console.WriteLine("Izdavac nije pronadjen.");
+            Console.WriteLine("Izdavac nije pronadjen.");
             return;
         }
 
-        System.Console.Write("Novi naziv: ");
-        string naziv = System.Console.ReadLine() ?? "";
-
-        if (string.IsNullOrWhiteSpace(naziv))
-        {
-            System.Console.WriteLine("Naziv ne sme biti prazan.");
-            return;
-        }
+        Console.Write($"Novi naziv ({postojeci.Naziv}): ");
+        string? naziv = Console.ReadLine();
 
         Izdavac izmenjeni = new Izdavac
         {
             Id = postojeci.Id,
-            Naziv = naziv,
-            SefId = postojeci.SefId
+            Naziv = string.IsNullOrWhiteSpace(naziv)
+                ? postojeci.Naziv
+                : naziv.Trim(),
+            SefId = postojeci.SefId,
+            AutorIds = new List<int>(postojeci.AutorIds ?? new List<int>())
         };
 
         if (_servis.Izmeni(izmenjeni))
-            System.Console.WriteLine("Izdavac je izmenjen.");
+            Console.WriteLine("Izdavac je uspesno izmenjen.");
+        else
+            Console.WriteLine("Izmena nije uspela.");
     }
 
     private void Obrisi()
     {
         System.Console.Write("ID izdavaca: ");
 
-        if (!int.TryParse(System.Console.ReadLine(), out int id))
+        if (!int.TryParse(System.Console.ReadLine(), out int id) || id <= 0)
         {
             System.Console.WriteLine("Neispravan ID.");
             return;
         }
 
+        var izdavac = _servis.PrikaziSve()
+            .FirstOrDefault(i => i.Id == id);
+
+        if (izdavac == null)
+        {
+            System.Console.WriteLine("Izdavac nije pronadjen.");
+            return;
+        }
+
+        string putanjaKnjige = Path.Combine(
+            AppContext.BaseDirectory,
+            "Podaci",
+            "knjige.xml"
+        );
+
+        KnjigaServis knjigaServis = new KnjigaServis(putanjaKnjige);
+
+        if (knjigaServis.ImaKnjigeIzdavaca(id))
+        {
+            System.Console.WriteLine(
+                "Izdavac ima povezane knjige i ne moze biti obrisan.");
+            return;
+        }
+
+        System.Console.Write("Da li sigurno zelis da obrises izdavaca? (D/N): ");
+
+        string odgovor = (System.Console.ReadLine() ?? "")
+            .Trim()
+            .ToUpperInvariant();
+
+        if (odgovor != "D")
+        {
+            System.Console.WriteLine("Brisanje je otkazano.");
+            return;
+        }
+
         if (_servis.Obrisi(id))
-            System.Console.WriteLine("Izdavac je obrisan.");
+            System.Console.WriteLine("Izdavac je uspesno obrisan.");
         else
             System.Console.WriteLine("Izdavac nije pronadjen.");
     }

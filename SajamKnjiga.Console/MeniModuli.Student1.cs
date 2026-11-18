@@ -12,6 +12,7 @@ public static partial class MeniModuli
         moduli.Add(new PosetiociMeni());
         moduli.Add(new IzdavaciMeni());
         moduli.Add(new KupovineMeni());
+        moduli.Add(new KnjigeMeni());
     }
 
 }
