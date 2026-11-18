@@ -32,6 +32,14 @@ public class KupovinaServis
 
     public void Dodaj(Kupovina kupovina)
     {
+        if (kupovina.Id <= 0 ||
+    kupovina.PosetilacId <= 0 ||
+    kupovina.KnjigaId <= 0)
+        {
+            throw new InvalidOperationException(
+                "ID kupovine, posetioca i knjige moraju biti pozitivni.");
+        }
+
         if (_kupovine.Any(k => k.Id == kupovina.Id))
         {
             throw new InvalidOperationException(
@@ -64,9 +72,8 @@ public class KupovinaServis
                 "Ocena mora biti izmedju 1 i 5.");
         }
 
-        postojeca.PosetilacId = izmenjenaKupovina.PosetilacId;
-        postojeca.KnjigaId = izmenjenaKupovina.KnjigaId;
-        postojeca.DatumKupovine = izmenjenaKupovina.DatumKupovine;
+        postojeca.Ocena = izmenjenaKupovina.Ocena;
+        postojeca.Komentar = izmenjenaKupovina.Komentar;
         postojeca.Ocena = izmenjenaKupovina.Ocena;
         postojeca.Komentar = izmenjenaKupovina.Komentar;
 

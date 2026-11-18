@@ -88,6 +88,12 @@ public class IzdavaciMeni : IMeniModul
             System.Console.WriteLine(
                 $"ID: {i.Id} | Naziv: {i.Naziv} | Sef ID: {i.SefId}"
             );
+
+            string autori = i.AutorIds != null && i.AutorIds.Count > 0
+                ? string.Join(", ", i.AutorIds)
+                : "Nema povezanih autora";
+
+            System.Console.WriteLine($"Autori (ID): {autori}");
         }
     }
 

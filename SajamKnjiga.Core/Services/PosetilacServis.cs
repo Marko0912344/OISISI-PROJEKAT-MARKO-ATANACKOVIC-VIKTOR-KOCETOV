@@ -22,12 +22,30 @@ public class PosetilacServis
         return new List<Posetilac>(_posetioci);
     }
 
+
     public void Dodaj(Posetilac posetilac)
     {
-        if (_posetioci.Any(p => p.Id == posetilac.Id))
+        if (posetilac.Id <= 0)
+            throw new System.InvalidOperationException(
+                "ID mora biti pozitivan broj.");
+
+        if (string.IsNullOrWhiteSpace(posetilac.Ime) ||
+            string.IsNullOrWhiteSpace(posetilac.Prezime) ||
+            string.IsNullOrWhiteSpace(posetilac.BrojClanskeKarte))
         {
             throw new System.InvalidOperationException(
+                "Ime, prezime i broj clanske karte su obavezni.");
+        }
+
+        if (_posetioci.Any(p => p.Id == posetilac.Id))
+            throw new System.InvalidOperationException(
                 "Posetilac sa ovim ID-jem vec postoji.");
+
+        if (_posetioci.Any(p =>
+            p.BrojClanskeKarte == posetilac.BrojClanskeKarte))
+        {
+            throw new System.InvalidOperationException(
+                "Broj clanske karte vec postoji.");
         }
 
         _posetioci.Add(posetilac);
@@ -48,14 +66,30 @@ public class PosetilacServis
         return true;
     }
 
+
     public bool Izmeni(Posetilac izmenjeni)
     {
         Posetilac? postojeci =
-            _posetioci.FirstOrDefault(
-                p => p.Id == izmenjeni.Id);
+            _posetioci.FirstOrDefault(p => p.Id == izmenjeni.Id);
 
         if (postojeci == null)
             return false;
+
+        if (string.IsNullOrWhiteSpace(izmenjeni.Ime) ||
+            string.IsNullOrWhiteSpace(izmenjeni.Prezime) ||
+            string.IsNullOrWhiteSpace(izmenjeni.BrojClanskeKarte))
+        {
+            throw new System.InvalidOperationException(
+                "Ime, prezime i broj clanske karte su obavezni.");
+        }
+
+        if (_posetioci.Any(p =>
+            p.Id != izmenjeni.Id &&
+            p.BrojClanskeKarte == izmenjeni.BrojClanskeKarte))
+        {
+            throw new System.InvalidOperationException(
+                "Broj clanske karte vec postoji.");
+        }
 
         int indeks = _posetioci.IndexOf(postojeci);
         _posetioci[indeks] = izmenjeni;
@@ -64,4 +98,5 @@ public class PosetilacServis
 
         return true;
     }
+
 }
