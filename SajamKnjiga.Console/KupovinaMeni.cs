@@ -193,6 +193,21 @@ public class KupovineMeni : IMeniModul
             return;
         }
 
+        System.Console.Write("Datum kupovine (dd.MM.yyyy): ");
+        string unosDatuma = System.Console.ReadLine() ?? "";
+
+        if (!DateTime.TryParseExact(
+            unosDatuma,
+            "dd.MM.yyyy",
+            System.Globalization.CultureInfo.InvariantCulture,
+            System.Globalization.DateTimeStyles.None,
+            out DateTime datumKupovine))
+        {
+            System.Console.WriteLine(
+                "Neispravan datum. Koristi format dd.MM.yyyy.");
+            return;
+        }
+
         System.Console.Write("Ocena (1-5): ");
         if (!int.TryParse(System.Console.ReadLine(), out int ocena) ||
             ocena < 1 || ocena > 5)
@@ -209,7 +224,7 @@ public class KupovineMeni : IMeniModul
             Id = id,
             PosetilacId = posetilacId,
             KnjigaId = knjigaId,
-            DatumKupovine = DateTime.Today,
+            DatumKupovine = datumKupovine,
             Ocena = ocena,
             Komentar = komentar
         };
@@ -385,6 +400,7 @@ public class KupovineMeni : IMeniModul
     }
 
 
+
     private void Izmeni()
     {
         System.Console.Write("ID kupovine za izmenu: ");
@@ -404,9 +420,31 @@ public class KupovineMeni : IMeniModul
             return;
         }
 
-        System.Console.Write($"Nova ocena (1-5), trenutna {kupovina.Ocena}: ");
-        string unosOcene = System.Console.ReadLine() ?? "";
+        System.Console.Write(
+            $"Novi datum kupovine (dd.MM.yyyy), trenutni {kupovina.DatumKupovine:dd.MM.yyyy}: ");
 
+        string unosDatuma = System.Console.ReadLine() ?? "";
+        DateTime noviDatum = kupovina.DatumKupovine;
+
+        if (!string.IsNullOrWhiteSpace(unosDatuma))
+        {
+            if (!DateTime.TryParseExact(
+                unosDatuma,
+                "dd.MM.yyyy",
+                System.Globalization.CultureInfo.InvariantCulture,
+                System.Globalization.DateTimeStyles.None,
+                out noviDatum))
+            {
+                System.Console.WriteLine(
+                    "Neispravan datum. Koristi format dd.MM.yyyy.");
+                return;
+            }
+        }
+
+        System.Console.Write(
+            $"Nova ocena (1-5), trenutna {kupovina.Ocena}: ");
+
+        string unosOcene = System.Console.ReadLine() ?? "";
         int novaOcena = kupovina.Ocena;
 
         if (!string.IsNullOrWhiteSpace(unosOcene))
@@ -419,54 +457,65 @@ public class KupovineMeni : IMeniModul
             }
         }
 
-        System.Console.Write($"Novi komentar (trenutni: {kupovina.Komentar}): ");
-        string noviKomentar = System.Console.ReadLine() ?? "";
+        System.Console.Write(
+            $"Novi komentar (trenutni: {kupovina.Komentar}): ");
+
+        string unosKomentara = System.Console.ReadLine() ?? "";
+
+        string noviKomentar = string.IsNullOrWhiteSpace(unosKomentara)
+            ? kupovina.Komentar
+            : unosKomentara;
 
         var izmenjena = new SajamKnjiga.Core.Models.Kupovina
         {
             Id = kupovina.Id,
             PosetilacId = kupovina.PosetilacId,
             KnjigaId = kupovina.KnjigaId,
-            DatumKupovine = kupovina.DatumKupovine,
+            DatumKupovine = noviDatum,
             Ocena = novaOcena,
-            Komentar = string.IsNullOrWhiteSpace(noviKomentar)
-                ? kupovina.Komentar
-                : noviKomentar
+            Komentar = noviKomentar
         };
 
-        bool uspesno = _servis.Izmeni(izmenjena);
-
-        if (!uspesno)
+        try
         {
-            System.Console.WriteLine("Izmena nije uspela.");
-            return;
+            bool uspesno = _servis.Izmeni(izmenjena);
+
+            if (!uspesno)
+            {
+                System.Console.WriteLine("Izmena nije uspela.");
+                return;
+            }
+
+            string putanjaPosetioci = Path.Combine(
+                AppContext.BaseDirectory,
+                "Podaci",
+                "posetioci.xml");
+
+            var posetilacServis =
+                new PosetilacServis(putanjaPosetioci);
+
+            var posetilac = posetilacServis.PrikaziSve()
+                .FirstOrDefault(p => p.Id == kupovina.PosetilacId);
+
+            if (posetilac != null)
+            {
+                var kupovine = _servis.KupovinePosetioca(posetilac.Id);
+
+                posetilac.ProsecnaOcena = kupovine.Count > 0
+                    ? kupovine.Average(k => k.Ocena)
+                    : 0;
+
+                posetilacServis.Izmeni(posetilac);
+            }
+
+            System.Console.WriteLine("Kupovina je uspesno izmenjena.");
         }
-
-        string putanjaPosetioci = Path.Combine(
-            AppContext.BaseDirectory,
-            "Podaci",
-            "posetioci.xml"
-        );
-
-        PosetilacServis posetilacServis =
-            new PosetilacServis(putanjaPosetioci);
-
-        var posetilac = posetilacServis.PrikaziSve()
-            .FirstOrDefault(p => p.Id == kupovina.PosetilacId);
-
-        if (posetilac != null)
+        catch (InvalidOperationException ex)
         {
-            var kupovine = _servis.KupovinePosetioca(posetilac.Id);
-
-            posetilac.ProsecnaOcena = kupovine.Count > 0
-                ? kupovine.Average(k => k.Ocena)
-                : 0;
-
-            posetilacServis.Izmeni(posetilac);
+            System.Console.WriteLine(ex.Message);
         }
-
-        System.Console.WriteLine("Kupovina je uspesno izmenjena.");
     }
+
 
 
 }

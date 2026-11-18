@@ -156,6 +156,44 @@ public class KnjigaServis
 
         return true;
     }
+    public bool Obrisi(
+    int id,
+    KupovinaServis kupovinaServis,
+    ListaZeljaServis listaZeljaServis)
+    {
+        Knjiga? knjiga = _knjige.FirstOrDefault(k => k.Id == id);
 
-    
+        if (knjiga == null)
+            return false;
+
+        if (kupovinaServis.PrikaziSve()
+            .Any(k => k.KnjigaId == id))
+        {
+            throw new InvalidOperationException(
+                "Knjiga ima evidentirane kupovine i ne moze biti obrisana.");
+        }
+
+        if (listaZeljaServis.PrikaziSve()
+            .Any(s => s.KnjigaId == id))
+        {
+            throw new InvalidOperationException(
+                "Knjiga se nalazi na listi zelja i ne moze biti obrisana.");
+        }
+
+        int indeks = _knjige.IndexOf(knjiga);
+        _knjige.RemoveAt(indeks);
+
+        try
+        {
+            _skladiste.Sacuvaj(_knjige);
+        }
+        catch
+        {
+            _knjige.Insert(indeks, knjiga);
+            throw;
+        }
+
+        return true;
+    }
+
 }

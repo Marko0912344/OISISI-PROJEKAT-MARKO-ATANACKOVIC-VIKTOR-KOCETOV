@@ -324,7 +324,23 @@ public class PosetiociMeni : IMeniModul
             System.Console.WriteLine("Posetilac nije pronadjen.");
             return;
         }
-
+        postojeci = new Posetilac
+        {
+            Id = postojeci.Id,
+            Ime = postojeci.Ime,
+            Prezime = postojeci.Prezime,
+            DatumRodjenja = postojeci.DatumRodjenja,
+            Telefon = postojeci.Telefon,
+            Email = postojeci.Email,
+            BrojClanskeKarte = postojeci.BrojClanskeKarte,
+            GodinaClanstva = postojeci.GodinaClanstva,
+            Status = postojeci.Status,
+            ProsecnaOcena = postojeci.ProsecnaOcena,
+            AdresaId = postojeci.AdresaId,
+            Adresa = postojeci.Adresa,
+            Kupovine = new List<Kupovina>(postojeci.Kupovine),
+            ListaZelja = new List<StavkaListeZelja>(postojeci.ListaZelja)
+        };
         System.Console.WriteLine(
             "Pritisni Enter da zadrzis postojecu vrednost.");
 

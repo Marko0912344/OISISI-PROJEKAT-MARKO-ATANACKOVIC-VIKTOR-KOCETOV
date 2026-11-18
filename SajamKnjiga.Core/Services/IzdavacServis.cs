@@ -65,7 +65,7 @@ public class IzdavacServis
         return true;
     }
 
-    public bool Obrisi(int id)
+    public bool Obrisi(int id, KnjigaServis knjigaServis)
     {
         Izdavac? izdavac = _izdavaci
             .FirstOrDefault(i => i.Id == id);
@@ -73,8 +73,23 @@ public class IzdavacServis
         if (izdavac == null)
             return false;
 
+        if (knjigaServis.ImaKnjigeIzdavaca(id))
+        {
+            throw new InvalidOperationException(
+                "Izdavac ima povezane knjige i ne moze biti obrisan.");
+        }
+
         _izdavaci.Remove(izdavac);
-        _skladiste.Sacuvaj(_izdavaci);
+
+        try
+        {
+            _skladiste.Sacuvaj(_izdavaci);
+        }
+        catch
+        {
+            _izdavaci.Add(izdavac);
+            throw;
+        }
 
         return true;
     }

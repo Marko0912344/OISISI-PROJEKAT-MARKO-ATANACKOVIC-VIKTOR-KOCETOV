@@ -22,6 +22,7 @@ public class KnjigeMeni : IMeniModul
         while (true)
         {
             Console.WriteLine("\n=== KNJIGE ===");
+            Console.WriteLine("4. Obrisi knjigu");
             Console.WriteLine("3. Izmeni knjigu");
             Console.WriteLine("2. Dodaj knjigu");
             Console.WriteLine("1. Prikazi knjige");
@@ -70,7 +71,17 @@ public class KnjigeMeni : IMeniModul
                     Console.WriteLine(ex.Message);
                 }
             }
-
+            else if (izbor == "4")
+            {
+                try
+                {
+                    Obrisi();
+                }
+                catch (InvalidOperationException ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+            }
             else
             {
                 Console.WriteLine("Nepostojeca opcija.");
@@ -272,5 +283,52 @@ public class KnjigeMeni : IMeniModul
         else
             Console.WriteLine("Izmena nije uspela.");
     }
+    private void Obrisi()
+    {
+        Console.Write("Unesi ID knjige za brisanje: ");
 
+        if (!int.TryParse(Console.ReadLine(), out int id) || id <= 0)
+        {
+            Console.WriteLine("Neispravan ID knjige.");
+            return;
+        }
+
+        var knjiga = _servis.PrikaziSve()
+            .FirstOrDefault(k => k.Id == id);
+
+        if (knjiga == null)
+        {
+            Console.WriteLine("Knjiga nije pronadjena.");
+            return;
+        }
+
+        Console.WriteLine($"Knjiga: {knjiga.Naziv}");
+        Console.Write("Da li sigurno zelis da obrises knjigu? (D/N): ");
+
+        string? potvrda = Console.ReadLine();
+
+        if (!string.Equals(potvrda, "D",
+            StringComparison.OrdinalIgnoreCase))
+        {
+            Console.WriteLine("Brisanje je otkazano.");
+            return;
+        }
+
+        string putanjaKupovine = Path.Combine(
+            AppContext.BaseDirectory, "Podaci", "kupovine.xml");
+
+        string putanjaListaZelja = Path.Combine(
+            AppContext.BaseDirectory, "Podaci", "listaZelja.xml");
+
+        var kupovinaServis = new KupovinaServis(putanjaKupovine);
+        var listaZeljaServis = new ListaZeljaServis(putanjaListaZelja);
+
+        bool obrisana = _servis.Obrisi(
+            id, kupovinaServis, listaZeljaServis);
+
+        if (obrisana)
+            Console.WriteLine("Knjiga je uspesno obrisana.");
+        else
+            Console.WriteLine("Brisanje nije uspelo.");
+    }
 }

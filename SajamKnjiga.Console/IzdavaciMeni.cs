@@ -371,7 +371,7 @@ public class IzdavaciMeni : IMeniModul
             return;
         }
 
-        if (_servis.Obrisi(id))
+        if (_servis.Obrisi(id,knjigaServis))
             System.Console.WriteLine("Izdavac je uspesno obrisan.");
         else
             System.Console.WriteLine("Izdavac nije pronadjen.");
