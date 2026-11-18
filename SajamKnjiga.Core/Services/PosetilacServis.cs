@@ -23,6 +23,7 @@ public class PosetilacServis
     }
 
 
+
     public void Dodaj(Posetilac posetilac)
     {
         if (posetilac.Id <= 0)
@@ -37,6 +38,13 @@ public class PosetilacServis
                 "Ime, prezime i broj clanske karte su obavezni.");
         }
 
+        if (posetilac.GodinaClanstva < 1900 ||
+            posetilac.GodinaClanstva > System.DateTime.Now.Year)
+        {
+            throw new System.InvalidOperationException(
+                "Godina clanstva nije ispravna.");
+        }
+
         if (_posetioci.Any(p => p.Id == posetilac.Id))
             throw new System.InvalidOperationException(
                 "Posetilac sa ovim ID-jem vec postoji.");
@@ -49,11 +57,24 @@ public class PosetilacServis
         }
 
         _posetioci.Add(posetilac);
-        _skladiste.Sacuvaj(_posetioci);
+
+        try
+        {
+            _skladiste.Sacuvaj(_posetioci);
+        }
+        catch
+        {
+            _posetioci.Remove(posetilac);
+            throw;
+        }
     }
 
 
-    public bool Obrisi(int id, KupovinaServis kupovinaServis)
+
+    public bool Obrisi(
+    int id,
+    KupovinaServis kupovinaServis,
+    ListaZeljaServis listaZeljaServis)
     {
         Posetilac? posetilac =
             _posetioci.FirstOrDefault(p => p.Id == id);
@@ -61,13 +82,32 @@ public class PosetilacServis
         if (posetilac == null)
             return false;
 
+        if (kupovinaServis.KupovinePosetioca(id).Any())
+        {
+            throw new InvalidOperationException(
+                "Posetilac ima evidentirane kupovine i ne moze biti obrisan.");
+        }
+
+        if (listaZeljaServis.ListaPosetioca(id).Any())
+        {
+            throw new InvalidOperationException(
+                "Posetilac ima knjige na listi zelja i ne moze biti obrisan.");
+        }
 
         _posetioci.Remove(posetilac);
-        _skladiste.Sacuvaj(_posetioci);
+
+        try
+        {
+            _skladiste.Sacuvaj(_posetioci);
+        }
+        catch
+        {
+            _posetioci.Add(posetilac);
+            throw;
+        }
 
         return true;
     }
-
 
 
     public bool Izmeni(Posetilac izmenjeni)
@@ -86,6 +126,13 @@ public class PosetilacServis
                 "Ime, prezime i broj clanske karte su obavezni.");
         }
 
+        if (izmenjeni.GodinaClanstva < 1900 ||
+            izmenjeni.GodinaClanstva > System.DateTime.Now.Year)
+        {
+            throw new System.InvalidOperationException(
+                "Godina clanstva nije ispravna.");
+        }
+
         if (_posetioci.Any(p =>
             p.Id != izmenjeni.Id &&
             p.BrojClanskeKarte == izmenjeni.BrojClanskeKarte))
@@ -97,7 +144,15 @@ public class PosetilacServis
         int indeks = _posetioci.IndexOf(postojeci);
         _posetioci[indeks] = izmenjeni;
 
-        _skladiste.Sacuvaj(_posetioci);
+        try
+        {
+            _skladiste.Sacuvaj(_posetioci);
+        }
+        catch
+        {
+            _posetioci[indeks] = postojeci;
+            throw;
+        }
 
         return true;
     }

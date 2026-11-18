@@ -58,10 +58,11 @@ foreach (Posetilac p in servis.PrikaziSve())
 
 // 4. BRISANJE
 Console.WriteLine("\n4. BRISANJE");
-var kupovinaServis = new KupovinaServis("Podaci/kupovine.xml");
-servis.Obrisi(1,kupovinaServis);
 
-Console.WriteLine(
-    "Broj preostalih posetilaca: " +
-    servis.PrikaziSve().Count
-);
+var kupovinaServis =
+    new KupovinaServis("Podaci/kupovine.xml");
+
+var listaZeljaServis =
+    new ListaZeljaServis("Podaci/listaZelja.xml");
+
+servis.Obrisi(1, kupovinaServis, listaZeljaServis);

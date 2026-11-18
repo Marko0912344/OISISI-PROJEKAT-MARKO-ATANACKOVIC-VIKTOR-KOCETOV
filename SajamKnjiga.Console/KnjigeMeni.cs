@@ -47,13 +47,28 @@ public class KnjigeMeni : IMeniModul
                     Console.WriteLine($"Izdavac ID: {knjiga.IzdavacId}");
                 }
             }
+
             else if (izbor == "2")
             {
-                Dodaj();
+                try
+                {
+                    Dodaj();
+                }
+                catch (InvalidOperationException ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
             }
             else if (izbor == "3")
             {
-                Izmeni();
+                try
+                {
+                    Izmeni();
+                }
+                catch (InvalidOperationException ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
             }
 
             else

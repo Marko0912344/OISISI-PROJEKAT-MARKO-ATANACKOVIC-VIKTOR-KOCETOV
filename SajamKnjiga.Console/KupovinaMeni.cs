@@ -173,6 +173,26 @@ public class KupovineMeni : IMeniModul
             return;
         }
 
+        string putanjaListaZelja = Path.Combine(
+            AppContext.BaseDirectory,
+            "Podaci",
+            "listaZelja.xml"
+        );
+
+        ListaZeljaServis listaZeljaServis =
+            new ListaZeljaServis(putanjaListaZelja);
+
+        bool knjigaNaListi = listaZeljaServis
+            .ListaPosetioca(posetilacId)
+            .Any(s => s.KnjigaId == knjigaId);
+
+        if (!knjigaNaListi)
+        {
+            System.Console.WriteLine(
+                "Kupovina nije moguca. Knjiga nije na listi zelja posetioca.");
+            return;
+        }
+
         System.Console.Write("Ocena (1-5): ");
         if (!int.TryParse(System.Console.ReadLine(), out int ocena) ||
             ocena < 1 || ocena > 5)
@@ -200,6 +220,19 @@ public class KupovineMeni : IMeniModul
         {
             _servis.Dodaj(kupovina);
 
+            bool uklonjena = listaZeljaServis.Ukloni(
+                posetilacId,
+                knjigaId
+            );
+
+            if (!uklonjena)
+            {
+                _servis.Obrisi(kupovina.Id);
+
+                throw new InvalidOperationException(
+                    "Kupovina nije zavrsena jer knjiga nije uklonjena sa liste zelja.");
+            }
+
             var posetilac = posetilacServis.PrikaziSve()
                 .FirstOrDefault(p => p.Id == posetilacId);
 
@@ -223,9 +256,12 @@ public class KupovineMeni : IMeniModul
     }
 
 
+
+
+
     private void Obrisi()
     {
-        System.Console.Write("ID kupovine za brisanje: ");
+        System.Console.Write("ID kupovine za ponistavanje: ");
 
         if (!int.TryParse(System.Console.ReadLine(), out int id) || id <= 0)
         {
@@ -242,52 +278,112 @@ public class KupovineMeni : IMeniModul
             return;
         }
 
-        System.Console.Write("Da li sigurno zelis da obrises kupovinu? (D/N): ");
+        System.Console.Write("Da li zelis da ponistis kupovinu? (D/N): ");
+
         string odgovor = (System.Console.ReadLine() ?? "")
             .Trim()
             .ToUpperInvariant();
 
         if (odgovor != "D")
         {
-            System.Console.WriteLine("Brisanje je otkazano.");
+            System.Console.WriteLine("Ponistavanje je otkazano.");
             return;
         }
+
+        string folder = Path.Combine(
+            AppContext.BaseDirectory, "Podaci");
+
+        var posetilacServis = new PosetilacServis(
+            Path.Combine(folder, "posetioci.xml"));
+
+        var knjigaServis = new KnjigaServis(
+            Path.Combine(folder, "knjige.xml"));
+
+        var listaZeljaServis = new ListaZeljaServis(
+            Path.Combine(folder, "listaZelja.xml"));
 
         int posetilacId = kupovina.PosetilacId;
+        int knjigaId = kupovina.KnjigaId;
 
-        bool obrisana = _servis.Obrisi(id);
-
-        if (!obrisana)
+        try
         {
-            System.Console.WriteLine("Kupovina nije pronadjena.");
-            return;
+            // Proveravamo da li je knjiga vec na listi zelja.
+            bool vecNaListi = listaZeljaServis
+                .ListaPosetioca(posetilacId)
+                .Any(s => s.KnjigaId == knjigaId);
+
+            if (vecNaListi)
+            {
+                System.Console.WriteLine(
+                    "Knjiga je vec na listi zelja. Ponistavanje nije izvrseno.");
+                return;
+            }
+
+            // Prvo brisemo kupovinu.
+            bool obrisana = _servis.Obrisi(id);
+
+            if (!obrisana)
+            {
+                System.Console.WriteLine("Kupovina nije pronadjena.");
+                return;
+            }
+
+            // Zatim vracamo knjigu na listu zelja.
+            try
+            {
+                listaZeljaServis.Dodaj(
+                    posetilacId,
+                    knjigaId,
+                    posetilacServis,
+                    knjigaServis,
+                    _servis);
+            }
+            catch
+            {
+                // Ako vracanje na listu zelja ne uspe,
+                // pokusavamo da vratimo kupovinu.
+                try
+                {
+                    _servis.Dodaj(kupovina);
+                }
+                catch (Exception rollbackEx)
+                {
+                    System.Console.WriteLine(
+                        "UPOZORENJE: Kupovina nije automatski vracena: "
+                        + rollbackEx.Message);
+                }
+
+                throw;
+            }
+
+            // Azuriramo prosecnu ocenu posetioca.
+            var posetilac = posetilacServis.PrikaziSve()
+                .FirstOrDefault(p => p.Id == posetilacId);
+
+            if (posetilac != null)
+            {
+                var preostaleKupovine =
+                    _servis.KupovinePosetioca(posetilacId);
+
+                posetilac.ProsecnaOcena =
+                    preostaleKupovine.Count > 0
+                        ? preostaleKupovine.Average(k => k.Ocena)
+                        : 0;
+
+                posetilacServis.Izmeni(posetilac);
+            }
+
+            System.Console.WriteLine(
+                "Kupovina je ponistena. Knjiga je vracena na listu zelja.");
         }
-
-        string putanjaPosetioci = Path.Combine(
-            AppContext.BaseDirectory,
-            "Podaci",
-            "posetioci.xml"
-        );
-
-        PosetilacServis posetilacServis =
-            new PosetilacServis(putanjaPosetioci);
-
-        var posetilac = posetilacServis.PrikaziSve()
-            .FirstOrDefault(p => p.Id == posetilacId);
-
-        if (posetilac != null)
+        catch (Exception ex)
         {
-            var preostaleKupovine = _servis.KupovinePosetioca(posetilacId);
-
-            posetilac.ProsecnaOcena = preostaleKupovine.Count > 0
-                ? preostaleKupovine.Average(k => k.Ocena)
-                : 0;
-
-            posetilacServis.Izmeni(posetilac);
+            System.Console.WriteLine(
+                "Greska prilikom ponistavanja kupovine: "
+                + ex.Message);
         }
-
-        System.Console.WriteLine("Kupovina je uspesno obrisana.");
     }
+
 
     private void Izmeni()
     {

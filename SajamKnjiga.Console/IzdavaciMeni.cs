@@ -198,42 +198,131 @@ public class IzdavaciMeni : IMeniModul
         }
     }
 
+
     private void Izmeni()
     {
-        Console.Write("ID izdavaca: ");
+        System.Console.Write("ID izdavaca: ");
 
-        if (!int.TryParse(Console.ReadLine(), out int id) || id <= 0)
+        if (!int.TryParse(System.Console.ReadLine(), out int id) || id <= 0)
         {
-            Console.WriteLine("Neispravan ID.");
+            System.Console.WriteLine("Neispravan ID.");
             return;
         }
 
         var postojeci = _servis.PrikaziSve()
-            .Find(i => i.Id == id);
+            .FirstOrDefault(i => i.Id == id);
 
         if (postojeci == null)
         {
-            Console.WriteLine("Izdavac nije pronadjen.");
+            System.Console.WriteLine("Izdavac nije pronadjen.");
             return;
         }
 
-        Console.Write($"Novi naziv ({postojeci.Naziv}): ");
-        string? naziv = Console.ReadLine();
+        System.Console.Write($"Novi naziv ({postojeci.Naziv}): ");
+        string naziv = System.Console.ReadLine() ?? "";
 
-        Izdavac izmenjeni = new Izdavac
+        if (string.IsNullOrWhiteSpace(naziv))
+            naziv = postojeci.Naziv;
+        else
+            naziv = naziv.Trim();
+
+        System.Console.Write(
+            $"Novi ID sefa ({postojeci.SefId?.ToString() ?? "nema"}) " +
+            "[Enter = bez promene, 0 = ukloni]: ");
+
+        string unosSefa = (System.Console.ReadLine() ?? "").Trim();
+
+        int? sefId = postojeci.SefId;
+
+        if (unosSefa == "0")
+        {
+            sefId = null;
+        }
+        else if (!string.IsNullOrWhiteSpace(unosSefa))
+        {
+            if (!int.TryParse(unosSefa, out int noviSefId) || noviSefId <= 0)
+            {
+                System.Console.WriteLine("Neispravan ID sefa.");
+                return;
+            }
+
+            sefId = noviSefId;
+        }
+
+        var autorIds = new List<int>(
+            postojeci.AutorIds ?? new List<int>());
+
+        System.Console.Write(
+            "Novi ID-jevi autora (odvojeni zarezom) " +
+            "[Enter = bez promene, 0 = ukloni sve]: ");
+
+        string unosAutora = (System.Console.ReadLine() ?? "").Trim();
+
+        if (unosAutora == "0")
+        {
+            autorIds.Clear();
+        }
+        else if (!string.IsNullOrWhiteSpace(unosAutora))
+        {
+            var noviAutori = new List<int>();
+
+            foreach (string deo in unosAutora.Split(','))
+            {
+                if (!int.TryParse(deo.Trim(), out int autorId) || autorId <= 0)
+                {
+                    System.Console.WriteLine("Neispravan ID autora.");
+                    return;
+                }
+
+                if (!noviAutori.Contains(autorId))
+                    noviAutori.Add(autorId);
+            }
+
+            autorIds = noviAutori;
+        }
+
+        string putanjaAutori = Path.Combine(
+            AppContext.BaseDirectory, "Podaci", "autori.xml");
+
+        var autorServis = new AutorServis(putanjaAutori);
+
+        if (sefId.HasValue && !autorServis.MozeBitiSef(sefId.Value))
+        {
+            System.Console.WriteLine(
+                "Sef mora biti postojeci autor sa najmanje 5 godina iskustva.");
+            return;
+        }
+
+        foreach (int autorId in autorIds)
+        {
+            if (autorServis.PronadjiPoId(autorId) == null)
+            {
+                System.Console.WriteLine(
+                    $"Autor sa ID-jem {autorId} ne postoji.");
+                return;
+            }
+        }
+
+        var izmenjeni = new Izdavac
         {
             Id = postojeci.Id,
-            Naziv = string.IsNullOrWhiteSpace(naziv)
-                ? postojeci.Naziv
-                : naziv.Trim(),
-            SefId = postojeci.SefId,
-            AutorIds = new List<int>(postojeci.AutorIds ?? new List<int>())
+            Naziv = naziv,
+            SefId = sefId,
+            AutorIds = autorIds
         };
 
-        if (_servis.Izmeni(izmenjeni))
-            Console.WriteLine("Izdavac je uspesno izmenjen.");
-        else
-            Console.WriteLine("Izmena nije uspela.");
+        try
+        {
+            if (_servis.Izmeni(izmenjeni))
+                System.Console.WriteLine("Izdavac je uspesno izmenjen.");
+            else
+                System.Console.WriteLine("Izmena nije uspela.");
+        }
+        catch (Exception ex)
+        {
+            System.Console.WriteLine(
+                "Greska prilikom izmene izdavaca: " + ex.Message);
+        }
     }
 
     private void Obrisi()

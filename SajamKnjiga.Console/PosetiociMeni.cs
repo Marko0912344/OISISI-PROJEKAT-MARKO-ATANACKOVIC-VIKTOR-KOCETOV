@@ -35,6 +35,7 @@ public class PosetiociMeni : IMeniModul
             System.Console.WriteLine("2. Dodaj posetioca");
             System.Console.WriteLine("3. Izmeni posetioca");
             System.Console.WriteLine("4. Obrisi posetioca");
+            System.Console.WriteLine("5. Dodaj knjigu na listu zelja");
             System.Console.WriteLine("0. Povratak");
 
             System.Console.Write("Izbor: ");
@@ -53,6 +54,9 @@ public class PosetiociMeni : IMeniModul
                     break;
                 case "4":
                     Obrisi();
+                    break;
+                case "5":
+                    DodajNaListuZelja();
                     break;
                 case "0":
                     return;
@@ -568,13 +572,30 @@ public class PosetiociMeni : IMeniModul
             return;
         }
 
+        string putanjaListaZelja = Path.Combine(
+            AppContext.BaseDirectory,
+            "Podaci",
+            "listaZelja.xml"
+        );
+
+        ListaZeljaServis listaZeljaServis =
+            new ListaZeljaServis(putanjaListaZelja);
+
+        if (listaZeljaServis.ListaPosetioca(id).Any())
+        {
+            System.Console.WriteLine(
+                "Posetilac ima knjige na listi zelja i ne moze biti obrisan.");
+            return;
+        }
+
         int adresaId = posetilac.AdresaId;
 
         bool obrisan;
 
         try
         {
-            obrisan = _servis.Obrisi(id, kupovinaServis);
+            obrisan = _servis.Obrisi(
+    id, kupovinaServis, listaZeljaServis);
         }
         catch (InvalidOperationException ex)
         {
@@ -610,6 +631,72 @@ public class PosetiociMeni : IMeniModul
         }
 
         System.Console.WriteLine("Posetilac je obrisan.");
+    }
+
+    private void DodajNaListuZelja()
+    {
+        System.Console.Write("ID posetioca: ");
+
+        if (!int.TryParse(System.Console.ReadLine(), out int posetilacId))
+        {
+            System.Console.WriteLine("Neispravan ID posetioca.");
+            return;
+        }
+
+        System.Console.Write("ID knjige: ");
+
+        if (!int.TryParse(System.Console.ReadLine(), out int knjigaId))
+        {
+            System.Console.WriteLine("Neispravan ID knjige.");
+            return;
+        }
+
+        string putanjaKnjige = Path.Combine(
+            AppContext.BaseDirectory,
+            "Podaci",
+            "knjige.xml"
+        );
+
+        string putanjaListaZelja = Path.Combine(
+            AppContext.BaseDirectory,
+            "Podaci",
+            "listaZelja.xml"
+        );
+
+        KnjigaServis knjigaServis =
+            new KnjigaServis(putanjaKnjige);
+
+        ListaZeljaServis listaZeljaServis =
+            new ListaZeljaServis(putanjaListaZelja);
+
+        try
+        {
+
+
+            var kupovinaServis = new KupovinaServis(
+                Path.Combine(
+                    AppContext.BaseDirectory,
+                    "Podaci",
+                    "kupovine.xml"));
+
+
+            listaZeljaServis.Dodaj(
+                posetilacId,
+                knjigaId,
+                _servis,
+                knjigaServis,
+                kupovinaServis
+            );
+
+
+
+            System.Console.WriteLine(
+                "Knjiga je uspesno dodata na listu zelja.");
+        }
+        catch (InvalidOperationException ex)
+        {
+            System.Console.WriteLine(ex.Message);
+        }
     }
 
 
