@@ -312,9 +312,8 @@ public class PosetiociMeni : IMeniModul
             System.Console.WriteLine("Neispravan ID.");
             return;
         }
-
         var postojeci = _servis.PrikaziSve()
-            .Find(p => p.Id == id);
+    .Find(p => p.Id == id);
 
         if (postojeci == null)
         {

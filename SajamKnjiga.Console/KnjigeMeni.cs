@@ -29,8 +29,14 @@ public class KnjigeMeni : IMeniModul
             {
                 foreach (var knjiga in _servis.PrikaziSve())
                 {
-                    Console.WriteLine(
-                        $"{knjiga.Id} - {knjiga.Naziv} - {knjiga.Cena} RSD");
+                    Console.WriteLine($"\nID: {knjiga.Id}");
+                    Console.WriteLine($"ISBN: {knjiga.ISBN}");
+                    Console.WriteLine($"Naziv: {knjiga.Naziv}");
+                    Console.WriteLine($"Zanr: {knjiga.Zanr}");
+                    Console.WriteLine($"Godina izdanja: {knjiga.GodinaIzdanja}");
+                    Console.WriteLine($"Cena: {knjiga.Cena} RSD");
+                    Console.WriteLine($"Broj strana: {knjiga.BrojStrana}");
+                    Console.WriteLine($"Izdavac ID: {knjiga.IzdavacId}");
                 }
             }
             else if (izbor == "2")
