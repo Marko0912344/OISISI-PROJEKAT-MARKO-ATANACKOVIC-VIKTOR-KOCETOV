@@ -73,6 +73,8 @@ public class IzdavaciMeni : IMeniModul
         }
     }
 
+
+
     private void Prikazi()
     {
         var izdavaci = _servis.PrikaziSve();
@@ -83,10 +85,23 @@ public class IzdavaciMeni : IMeniModul
             return;
         }
 
+        string putanjaKnjige = Path.Combine(
+            AppContext.BaseDirectory,
+            "Podaci",
+            "knjige.xml"
+        );
+
+        KnjigaServis knjigaServis = new KnjigaServis(putanjaKnjige);
+        var sveKnjige = knjigaServis.PrikaziSve();
+
         foreach (var i in izdavaci)
         {
+            System.Console.WriteLine("\n------------------------------");
+            System.Console.WriteLine($"ID: {i.Id}");
+            System.Console.WriteLine($"Naziv: {i.Naziv}");
+
             System.Console.WriteLine(
-                $"ID: {i.Id} | Naziv: {i.Naziv} | Sef ID: {i.SefId}"
+                $"Sef ID: {(i.SefId.HasValue ? i.SefId.Value.ToString() : "Nije postavljen")}"
             );
 
             string autori = i.AutorIds != null && i.AutorIds.Count > 0
@@ -94,7 +109,31 @@ public class IzdavaciMeni : IMeniModul
                 : "Nema povezanih autora";
 
             System.Console.WriteLine($"Autori (ID): {autori}");
+
+            var knjigeIzdavaca = sveKnjige
+                .Where(k => k.IzdavacId == i.Id)
+                .ToList();
+
+            System.Console.WriteLine("Knjige izdavaca:");
+
+            if (knjigeIzdavaca.Count == 0)
+            {
+                System.Console.WriteLine("  Nema knjiga.");
+            }
+            else
+            {
+                foreach (var knjiga in knjigeIzdavaca)
+                {
+                    System.Console.WriteLine(
+                        $"  - ID: {knjiga.Id}, " +
+                        $"Naziv: {knjiga.Naziv}, " +
+                        $"ISBN: {knjiga.ISBN}"
+                    );
+                }
+            }
         }
+
+        System.Console.WriteLine("------------------------------");
     }
 
     private void Dodaj()

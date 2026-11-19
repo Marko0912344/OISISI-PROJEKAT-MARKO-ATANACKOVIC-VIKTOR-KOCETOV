@@ -439,8 +439,14 @@ public class KupovineMeni : IMeniModul
                     "Neispravan datum. Koristi format dd.MM.yyyy.");
                 return;
             }
+            if (noviDatum.Date > DateTime.Today)
+            {
+                System.Console.WriteLine(
+                    "Datum kupovine ne moze biti u buducnosti.");
+                return;
+            }
         }
-
+        
         System.Console.Write(
             $"Nova ocena (1-5), trenutna {kupovina.Ocena}: ");
 

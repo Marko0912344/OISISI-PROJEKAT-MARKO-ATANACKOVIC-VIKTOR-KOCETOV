@@ -68,6 +68,8 @@ public class PosetiociMeni : IMeniModul
     }
 
 
+
+
     private void Prikazi()
     {
         var posetioci = _servis.PrikaziSve();
@@ -78,19 +80,31 @@ public class PosetiociMeni : IMeniModul
             return;
         }
 
-        string putanjaAdrese = Path.Combine(
-            AppContext.BaseDirectory,
-            "Podaci",
-            "adrese.xml"
-        );
+        string folder = Path.Combine(
+            AppContext.BaseDirectory, "Podaci");
 
-        AdresaServis adresaServis = new AdresaServis(putanjaAdrese);
+        AdresaServis adresaServis = new AdresaServis(
+            Path.Combine(folder, "adrese.xml"));
+
+        KupovinaServis kupovinaServis = new KupovinaServis(
+            Path.Combine(folder, "kupovine.xml"));
+
+        ListaZeljaServis listaZeljaServis = new ListaZeljaServis(
+            Path.Combine(folder, "listaZelja.xml"));
+
+        KnjigaServis knjigaServis = new KnjigaServis(
+            Path.Combine(folder, "knjige.xml"));
+
         var adrese = adresaServis.PrikaziSve();
+        var knjige = knjigaServis.PrikaziSve();
 
         foreach (var p in posetioci)
         {
-            Adresa? adresa = adrese
-                .FirstOrDefault(a => a.Id == p.AdresaId);
+            var adresa = adrese.FirstOrDefault(
+                a => a.Id == p.AdresaId);
+
+            var kupovine = kupovinaServis.KupovinePosetioca(p.Id);
+            var zelje = listaZeljaServis.ListaPosetioca(p.Id);
 
             System.Console.WriteLine("------------------------------");
             System.Console.WriteLine($"ID: {p.Id}");
@@ -103,43 +117,66 @@ public class PosetiociMeni : IMeniModul
             System.Console.WriteLine($"Godina clanstva: {p.GodinaClanstva}");
             System.Console.WriteLine($"Status: {p.Status}");
 
-            string putanjaKupovine = Path.Combine(
-                AppContext.BaseDirectory,
-                "Podaci",
-                "kupovine.xml"
-            );
-
-            KupovinaServis kupovinaServis =
-                new KupovinaServis(putanjaKupovine);
-
-            var kupovine = kupovinaServis.KupovinePosetioca(p.Id);
+            if (adresa != null)
+                System.Console.WriteLine($"Adresa: {adresa}");
+            else
+                System.Console.WriteLine("Adresa: Nije uneta");
 
             if (kupovine.Count > 0)
             {
-                double prosecnaOcena = kupovine.Average(k => k.Ocena);
-                System.Console.WriteLine($"Prosecna ocena: {prosecnaOcena:F2}");
+                double prosek = kupovine.Average(k => k.Ocena);
+                System.Console.WriteLine($"Prosecna ocena: {prosek:F2}");
             }
             else
             {
                 System.Console.WriteLine("Prosecna ocena: Nema ocena");
             }
 
+            System.Console.WriteLine("Kupljene knjige:");
 
-            if (adresa != null)
+            if (kupovine.Count == 0)
             {
-                System.Console.WriteLine($"Adresa: {adresa}");
+                System.Console.WriteLine("  Nema kupljenih knjiga.");
             }
             else
             {
-                System.Console.WriteLine("Adresa: Nije uneta");
+                foreach (var kupovina in kupovine)
+                {
+                    var knjiga = knjige.FirstOrDefault(
+                        k => k.Id == kupovina.KnjigaId);
+
+                    string naziv = knjiga?.Naziv ??
+                        $"Nepoznata knjiga (ID: {kupovina.KnjigaId})";
+
+                    System.Console.WriteLine(
+                        $"  - {naziv}, ocena: {kupovina.Ocena}, " +
+                        $"datum: {kupovina.DatumKupovine:dd.MM.yyyy}");
+                }
+            }
+
+            System.Console.WriteLine("Lista zelja:");
+
+            if (zelje.Count == 0)
+            {
+                System.Console.WriteLine("  Lista zelja je prazna.");
+            }
+            else
+            {
+                foreach (var zelja in zelje)
+                {
+                    var knjiga = knjige.FirstOrDefault(
+                        k => k.Id == zelja.KnjigaId);
+
+                    string naziv = knjiga?.Naziv ??
+                        $"Nepoznata knjiga (ID: {zelja.KnjigaId})";
+
+                    System.Console.WriteLine($"  - {naziv}");
+                }
             }
         }
 
         System.Console.WriteLine("------------------------------");
     }
-
-
-
 
     private void Dodaj()
     {
@@ -286,6 +323,7 @@ public class PosetiociMeni : IMeniModul
 
         try
         {
+
             if (_servis.PrikaziSve().Any(p => p.Id == novi.Id))
             {
                 System.Console.WriteLine(
@@ -293,8 +331,17 @@ public class PosetiociMeni : IMeniModul
                 return;
             }
 
+            if (_servis.PrikaziSve().Any(p =>
+                p.BrojClanskeKarte == novi.BrojClanskeKarte))
+            {
+                System.Console.WriteLine(
+                    "Posetilac sa ovim brojem clanske karte vec postoji.");
+                return;
+            }
+
             adresaServis.Dodaj(novaAdresa);
             _servis.Dodaj(novi);
+
 
             System.Console.WriteLine(
                 "Posetilac i njegova adresa su uspesno dodati.");

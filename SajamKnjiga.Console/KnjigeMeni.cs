@@ -88,6 +88,7 @@ public class KnjigeMeni : IMeniModul
             }
         }
     }
+
     private void Dodaj()
     {
         Console.Write("ID knjige: ");
@@ -131,11 +132,29 @@ public class KnjigeMeni : IMeniModul
         string? unosIzdavaca = Console.ReadLine();
 
         int? izdavacId = null;
+
         if (!string.IsNullOrWhiteSpace(unosIzdavaca))
         {
             if (!int.TryParse(unosIzdavaca, out int idIzdavaca) || idIzdavaca <= 0)
             {
                 Console.WriteLine("Neispravan ID izdavaca.");
+                return;
+            }
+
+            string putanjaIzdavaca = Path.Combine(
+                AppContext.BaseDirectory,
+                "Podaci",
+                "izdavaci.xml"
+            );
+
+            IzdavacServis izdavacServis = new IzdavacServis(putanjaIzdavaca);
+
+            bool postojiIzdavac = izdavacServis.PrikaziSve()
+                .Any(i => i.Id == idIzdavaca);
+
+            if (!postojiIzdavac)
+            {
+                Console.WriteLine("Izdavac sa tim ID-jem ne postoji.");
                 return;
             }
 
