@@ -89,40 +89,61 @@ public class KnjigeMeni : IMeniModul
         }
     }
 
+
+
+
     private void Dodaj()
     {
-        Console.Write("ID knjige: ");
-        if (!int.TryParse(Console.ReadLine(), out int id) || id <= 0)
+        int id = _servis.GenerisiSledeciId();
+
+        Console.WriteLine($"Automatski dodeljen ID knjige: {id}");
+
+        Console.Write("ISBN: ");
+        string isbn = (Console.ReadLine() ?? "").Trim();
+
+        if (string.IsNullOrWhiteSpace(isbn))
         {
-            Console.WriteLine("Neispravan ID.");
+            Console.WriteLine("ISBN je obavezan.");
             return;
         }
 
-        Console.Write("ISBN: ");
-        string isbn = Console.ReadLine() ?? "";
-
         Console.Write("Naziv: ");
-        string naziv = Console.ReadLine() ?? "";
+        string naziv = (Console.ReadLine() ?? "").Trim();
+
+        if (string.IsNullOrWhiteSpace(naziv))
+        {
+            Console.WriteLine("Naziv knjige je obavezan.");
+            return;
+        }
 
         Console.Write("Zanr: ");
-        string zanr = Console.ReadLine() ?? "";
+        string zanr = (Console.ReadLine() ?? "").Trim();
+
+        if (string.IsNullOrWhiteSpace(zanr))
+        {
+            Console.WriteLine("Zanr je obavezan.");
+            return;
+        }
 
         Console.Write("Godina izdanja: ");
-        if (!int.TryParse(Console.ReadLine(), out int godina))
+        if (!int.TryParse(Console.ReadLine(), out int godina) ||
+            godina < 1 || godina > DateTime.Now.Year)
         {
-            Console.WriteLine("Neispravna godina.");
+            Console.WriteLine("Neispravna godina izdanja.");
             return;
         }
 
         Console.Write("Cena: ");
-        if (!decimal.TryParse(Console.ReadLine(), out decimal cena) || cena < 0)
+        if (!decimal.TryParse(Console.ReadLine(), out decimal cena) ||
+            cena < 0)
         {
             Console.WriteLine("Neispravna cena.");
             return;
         }
 
         Console.Write("Broj strana: ");
-        if (!int.TryParse(Console.ReadLine(), out int brojStrana) || brojStrana <= 0)
+        if (!int.TryParse(Console.ReadLine(), out int brojStrana) ||
+            brojStrana <= 0)
         {
             Console.WriteLine("Neispravan broj strana.");
             return;
@@ -135,7 +156,8 @@ public class KnjigeMeni : IMeniModul
 
         if (!string.IsNullOrWhiteSpace(unosIzdavaca))
         {
-            if (!int.TryParse(unosIzdavaca, out int idIzdavaca) || idIzdavaca <= 0)
+            if (!int.TryParse(unosIzdavaca, out int idIzdavaca) ||
+                idIzdavaca <= 0)
             {
                 Console.WriteLine("Neispravan ID izdavaca.");
                 return;
@@ -147,7 +169,8 @@ public class KnjigeMeni : IMeniModul
                 "izdavaci.xml"
             );
 
-            IzdavacServis izdavacServis = new IzdavacServis(putanjaIzdavaca);
+            IzdavacServis izdavacServis =
+                new IzdavacServis(putanjaIzdavaca);
 
             bool postojiIzdavac = izdavacServis.PrikaziSve()
                 .Any(i => i.Id == idIzdavaca);
@@ -173,10 +196,21 @@ public class KnjigeMeni : IMeniModul
             IzdavacId = izdavacId
         };
 
-        if (_servis.Dodaj(knjiga))
-            Console.WriteLine("Knjiga je uspesno dodata.");
-        else
-            Console.WriteLine("Knjiga sa tim ID-jem vec postoji.");
+        try
+        {
+            if (_servis.Dodaj(knjiga))
+            {
+                Console.WriteLine("Knjiga je uspesno dodata.");
+            }
+            else
+            {
+                Console.WriteLine("Dodavanje knjige nije uspelo.");
+            }
+        }
+        catch (InvalidOperationException ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
     }
 
     private void Izmeni()

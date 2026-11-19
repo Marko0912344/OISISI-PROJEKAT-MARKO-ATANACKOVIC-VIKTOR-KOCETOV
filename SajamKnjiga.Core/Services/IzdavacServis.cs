@@ -24,12 +24,19 @@ public class IzdavacServis
     }
 
 
+
     public void Dodaj(Izdavac izdavac)
     {
         if (izdavac.Id <= 0)
         {
             throw new InvalidOperationException(
                 "ID izdavaca mora biti pozitivan broj.");
+        }
+
+        if (string.IsNullOrWhiteSpace(izdavac.Sifra))
+        {
+            throw new InvalidOperationException(
+                "Sifra izdavaca je obavezna.");
         }
 
         if (string.IsNullOrWhiteSpace(izdavac.Naziv))
@@ -44,9 +51,27 @@ public class IzdavacServis
                 "Izdavac sa ovim ID-jem vec postoji.");
         }
 
+        if (_izdavaci.Any(i => i.Sifra == izdavac.Sifra))
+        {
+            throw new InvalidOperationException(
+                "Izdavac sa ovom sifrom vec postoji.");
+        }
+
         _izdavaci.Add(izdavac);
-        _skladiste.Sacuvaj(_izdavaci);
+
+        try
+        {
+            _skladiste.Sacuvaj(_izdavaci);
+        }
+        catch
+        {
+            _izdavaci.Remove(izdavac);
+            throw;
+        }
     }
+
+
+
 
     public bool Izmeni(Izdavac izmenjeni)
     {
@@ -56,30 +81,37 @@ public class IzdavacServis
         if (postojeci == null)
             return false;
 
+        if (string.IsNullOrWhiteSpace(izmenjeni.Sifra))
+            throw new InvalidOperationException(
+                "Sifra izdavaca je obavezna.");
+
+        if (string.IsNullOrWhiteSpace(izmenjeni.Naziv))
+            throw new InvalidOperationException(
+                "Naziv izdavaca je obavezan.");
+
+        if (_izdavaci.Any(i =>
+            i.Id != izmenjeni.Id &&
+            i.Sifra == izmenjeni.Sifra))
+            throw new InvalidOperationException(
+                "Drugi izdavac vec koristi ovu sifru.");
+
+        string staraSifra = postojeci.Sifra;
+        string stariNaziv = postojeci.Naziv;
+        int? stariSefId = postojeci.SefId;
+        Autor? stariSef = postojeci.Sef;
+        var stariAutorIds = new List<int>(postojeci.AutorIds);
+
+        postojeci.Sifra = izmenjeni.Sifra;
         postojeci.Naziv = izmenjeni.Naziv;
         postojeci.SefId = izmenjeni.SefId;
+
+        postojeci.Sef = stariSefId == izmenjeni.SefId
+            ? stariSef
+            : izmenjeni.Sef?.Id == izmenjeni.SefId
+                ? izmenjeni.Sef
+                : null;
+
         postojeci.AutorIds = new List<int>(izmenjeni.AutorIds);
-
-        _skladiste.Sacuvaj(_izdavaci);
-
-        return true;
-    }
-
-    public bool Obrisi(int id, KnjigaServis knjigaServis)
-    {
-        Izdavac? izdavac = _izdavaci
-            .FirstOrDefault(i => i.Id == id);
-
-        if (izdavac == null)
-            return false;
-
-        if (knjigaServis.ImaKnjigeIzdavaca(id))
-        {
-            throw new InvalidOperationException(
-                "Izdavac ima povezane knjige i ne moze biti obrisan.");
-        }
-
-        _izdavaci.Remove(izdavac);
 
         try
         {
@@ -87,12 +119,52 @@ public class IzdavacServis
         }
         catch
         {
-            _izdavaci.Add(izdavac);
+            postojeci.Sifra = staraSifra;
+            postojeci.Naziv = stariNaziv;
+            postojeci.SefId = stariSefId;
+            postojeci.Sef = stariSef;
+            postojeci.AutorIds = stariAutorIds;
             throw;
         }
 
         return true;
     }
+
+
+    public bool Obrisi(int id, KnjigaServis knjigaServis)
+    {
+        Izdavac? izdavac = _izdavaci
+            .FirstOrDefault(i => i.Id == id);
+
+        if (izdavac == null)
+        {
+            return false;
+        }
+
+        if (knjigaServis.ImaKnjigeIzdavaca(id))
+        {
+            throw new InvalidOperationException(
+                "Izdavac ima povezane knjige i ne moze biti obrisan.");
+        }
+
+        int indeks = _izdavaci.IndexOf(izdavac);
+
+        _izdavaci.RemoveAt(indeks);
+
+        try
+        {
+            _skladiste.Sacuvaj(_izdavaci);
+        }
+        catch
+        {
+            _izdavaci.Insert(indeks, izdavac);
+            throw;
+        }
+
+        return true;
+    }
+
+
 
     public bool PostaviSefa(int izdavacId, int autorId, AutorServis autorServis)
     {
@@ -119,13 +191,27 @@ public class IzdavacServis
                 "Sef mora imati najmanje 5 godina iskustva.");
         }
 
+        int? prethodniSefId = izdavac.SefId;
+        Autor? prethodniSef = izdavac.Sef;
+
         izdavac.SefId = autor.Id;
         izdavac.Sef = autor;
 
-        _skladiste.Sacuvaj(_izdavaci);
+        try
+        {
+            _skladiste.Sacuvaj(_izdavaci);
+        }
+        catch
+        {
+            izdavac.SefId = prethodniSefId;
+            izdavac.Sef = prethodniSef;
+
+            throw;
+        }
 
         return true;
     }
+
 
     public bool PoveziAutora(int izdavacId, int autorId, AutorServis autorServis)
     {
@@ -152,9 +238,28 @@ public class IzdavacServis
 
         izdavac.AutorIds.Add(autorId);
 
-        _skladiste.Sacuvaj(_izdavaci);
+        try
+        {
+            _skladiste.Sacuvaj(_izdavaci);
+        }
+        catch
+        {
+            izdavac.AutorIds.Remove(autorId);
+            throw;
+        }
 
         return true;
+    }
+
+
+    public int GenerisiSledeciId()
+    {
+        if (_izdavaci.Count == 0)
+        {
+            return 1;
+        }
+
+        return _izdavaci.Max(i => i.Id) + 1;
     }
 
 }

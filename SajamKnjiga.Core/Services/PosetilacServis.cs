@@ -71,16 +71,19 @@ public class PosetilacServis
 
 
 
+
     public bool Obrisi(
-    int id,
-    KupovinaServis kupovinaServis,
-    ListaZeljaServis listaZeljaServis)
+        int id,
+        KupovinaServis kupovinaServis,
+        ListaZeljaServis listaZeljaServis)
     {
         Posetilac? posetilac =
             _posetioci.FirstOrDefault(p => p.Id == id);
 
         if (posetilac == null)
+        {
             return false;
+        }
 
         if (kupovinaServis.KupovinePosetioca(id).Any())
         {
@@ -94,7 +97,9 @@ public class PosetilacServis
                 "Posetilac ima knjige na listi zelja i ne moze biti obrisan.");
         }
 
-        _posetioci.Remove(posetilac);
+        int indeks = _posetioci.IndexOf(posetilac);
+
+        _posetioci.RemoveAt(indeks);
 
         try
         {
@@ -102,7 +107,7 @@ public class PosetilacServis
         }
         catch
         {
-            _posetioci.Add(posetilac);
+            _posetioci.Insert(indeks, posetilac);
             throw;
         }
 
@@ -155,6 +160,14 @@ public class PosetilacServis
         }
 
         return true;
+    }
+
+    public int GenerisiSledeciId()
+    {
+        if (_posetioci.Count == 0)
+            return 1;
+
+        return _posetioci.Max(p => p.Id) + 1;
     }
 
 }

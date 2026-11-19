@@ -26,6 +26,12 @@ public class PosetiociMeni : IMeniModul
         _servis = new PosetilacServis(putanja);
     }
 
+
+
+
+
+
+
     public void Pokreni()
     {
         while (true)
@@ -36,6 +42,9 @@ public class PosetiociMeni : IMeniModul
             System.Console.WriteLine("3. Izmeni posetioca");
             System.Console.WriteLine("4. Obrisi posetioca");
             System.Console.WriteLine("5. Dodaj knjigu na listu zelja");
+            System.Console.WriteLine("6. Prikazi kupljene knjige posetioca");
+            System.Console.WriteLine("7. Pretrazi posetioce");
+            System.Console.WriteLine("8. Sortiraj posetioce");
             System.Console.WriteLine("0. Povratak");
 
             System.Console.Write("Izbor: ");
@@ -46,28 +55,44 @@ public class PosetiociMeni : IMeniModul
                 case "1":
                     Prikazi();
                     break;
+
                 case "2":
                     Dodaj();
                     break;
+
                 case "3":
                     Izmeni();
                     break;
+
                 case "4":
                     Obrisi();
                     break;
+
                 case "5":
                     DodajNaListuZelja();
                     break;
+
+                case "6":
+                    PrikaziKupljeneKnjige();
+                    break;
+
+                case "7":
+                    PretraziPosetioce();
+                    break;
+
+                case "8":
+                    SortirajPosetioce();
+                    break;
+
                 case "0":
                     return;
+
                 default:
                     System.Console.WriteLine("Nepostojeca opcija.");
                     break;
             }
         }
     }
-
-
 
 
     private void Prikazi()
@@ -178,14 +203,14 @@ public class PosetiociMeni : IMeniModul
         System.Console.WriteLine("------------------------------");
     }
 
+
+
     private void Dodaj()
     {
-        System.Console.Write("ID: ");
-        if (!int.TryParse(System.Console.ReadLine(), out int id))
-        {
-            System.Console.WriteLine("Neispravan ID.");
-            return;
-        }
+        int id = _servis.GenerisiSledeciId();
+
+        System.Console.WriteLine(
+            $"Automatski dodeljen ID posetioca: {id}");
 
         System.Console.Write("Ime: ");
         string ime = System.Console.ReadLine() ?? "";
@@ -196,14 +221,12 @@ public class PosetiociMeni : IMeniModul
         System.Console.Write("Email: ");
         string email = System.Console.ReadLine() ?? "";
 
-
         if (string.IsNullOrWhiteSpace(ime) ||
             string.IsNullOrWhiteSpace(prezime) ||
             string.IsNullOrWhiteSpace(email))
         {
             System.Console.WriteLine(
                 "Ime, prezime i email su obavezni podaci.");
-
             return;
         }
 
@@ -211,6 +234,7 @@ public class PosetiociMeni : IMeniModul
         string telefon = System.Console.ReadLine() ?? "";
 
         System.Console.Write("Datum rodjenja (dd.MM.yyyy): ");
+
         if (!DateTime.TryParseExact(
             System.Console.ReadLine(),
             "dd.MM.yyyy",
@@ -232,7 +256,6 @@ public class PosetiociMeni : IMeniModul
         System.Console.Write("Broj clanske karte: ");
         string brojKarte = System.Console.ReadLine() ?? "";
 
-
         System.Console.Write("Godina clanstva: ");
 
         if (!int.TryParse(System.Console.ReadLine(), out int godina))
@@ -248,8 +271,8 @@ public class PosetiociMeni : IMeniModul
             return;
         }
 
-
         System.Console.Write("Status (R - Redovan, V - VIP): ");
+
         string statusUnos = (System.Console.ReadLine() ?? "")
             .Trim().ToUpperInvariant();
 
@@ -276,7 +299,8 @@ public class PosetiociMeni : IMeniModul
             string.IsNullOrWhiteSpace(grad) ||
             string.IsNullOrWhiteSpace(drzava))
         {
-            System.Console.WriteLine("Svi podaci adrese su obavezni.");
+            System.Console.WriteLine(
+                "Svi podaci adrese su obavezni.");
             return;
         }
 
@@ -312,18 +336,17 @@ public class PosetiociMeni : IMeniModul
             DatumRodjenja = datumRodjenja,
             BrojClanskeKarte = brojKarte,
             GodinaClanstva = godina,
+
             Status = statusUnos == "V"
-            ? StatusPosetioca.VIP
-            : StatusPosetioca.Redovan,
+                ? StatusPosetioca.VIP
+                : StatusPosetioca.Redovan,
 
             AdresaId = novaAdresa.Id,
             Adresa = novaAdresa
         };
 
-
         try
         {
-
             if (_servis.PrikaziSve().Any(p => p.Id == novi.Id))
             {
                 System.Console.WriteLine(
@@ -342,7 +365,6 @@ public class PosetiociMeni : IMeniModul
             adresaServis.Dodaj(novaAdresa);
             _servis.Dodaj(novi);
 
-
             System.Console.WriteLine(
                 "Posetilac i njegova adresa su uspesno dodati.");
         }
@@ -350,7 +372,6 @@ public class PosetiociMeni : IMeniModul
         {
             System.Console.WriteLine(ex.Message);
         }
-
     }
 
 
@@ -762,5 +783,200 @@ public class PosetiociMeni : IMeniModul
         }
     }
 
+    private void PrikaziKupljeneKnjige()
+    {
+        System.Console.Write("Unesi ID posetioca: ");
+
+        if (!int.TryParse(System.Console.ReadLine(), out int posetilacId)
+            || posetilacId <= 0)
+        {
+            System.Console.WriteLine("Neispravan ID posetioca.");
+            return;
+        }
+
+        var posetilac = _servis.PrikaziSve()
+            .FirstOrDefault(p => p.Id == posetilacId);
+
+        if (posetilac == null)
+        {
+            System.Console.WriteLine("Posetilac ne postoji.");
+            return;
+        }
+
+        string folder = Path.Combine(
+            AppContext.BaseDirectory,
+            "Podaci"
+        );
+
+        KupovinaServis kupovinaServis = new KupovinaServis(
+            Path.Combine(folder, "kupovine.xml")
+        );
+
+        KnjigaServis knjigaServis = new KnjigaServis(
+            Path.Combine(folder, "knjige.xml")
+        );
+
+        var kupovine = kupovinaServis.KupovinePosetioca(posetilacId);
+        var knjige = knjigaServis.PrikaziSve();
+
+        System.Console.WriteLine();
+        System.Console.WriteLine(
+            $"Kupljene knjige posetioca: {posetilac.Ime} {posetilac.Prezime}");
+
+        if (kupovine.Count == 0)
+        {
+            System.Console.WriteLine("Posetilac nema kupljenih knjiga.");
+            return;
+        }
+
+        decimal ukupnaPotrosnja = 0;
+
+        foreach (var kupovina in kupovine)
+        {
+            var knjiga = knjige.FirstOrDefault(
+                k => k.Id == kupovina.KnjigaId
+            );
+
+            System.Console.WriteLine("------------------------------");
+
+            if (knjiga == null)
+            {
+                System.Console.WriteLine(
+                    $"Knjiga sa ID-jem {kupovina.KnjigaId} nije pronadjena.");
+
+                System.Console.WriteLine(
+                    "Cena ove kupovine nije ukljucena u zbir.");
+
+                continue;
+            }
+
+            System.Console.WriteLine($"Naziv: {knjiga.Naziv}");
+            System.Console.WriteLine($"ISBN: {knjiga.ISBN}");
+            System.Console.WriteLine($"Cena: {knjiga.Cena:F2} RSD");
+            System.Console.WriteLine(
+                $"Datum kupovine: {kupovina.DatumKupovine:dd.MM.yyyy}");
+            System.Console.WriteLine($"Ocena: {kupovina.Ocena}");
+            System.Console.WriteLine($"Komentar: {kupovina.Komentar}");
+
+            ukupnaPotrosnja += knjiga.Cena;
+        }
+
+        System.Console.WriteLine("------------------------------");
+        System.Console.WriteLine($"Broj kupovina: {kupovine.Count}");
+        System.Console.WriteLine(
+            $"Ukupna potrosnja prema trenutnim cenama: {ukupnaPotrosnja:F2} RSD");
+    }
+
+
+    private void PretraziPosetioce()
+    {
+        System.Console.WriteLine("\n--- PRETRAGA POSETILACA ---");
+        System.Console.Write("Unesi ime, prezime ili broj clanske karte: ");
+
+        string unos = (System.Console.ReadLine() ?? "").Trim();
+
+        if (string.IsNullOrWhiteSpace(unos))
+        {
+            System.Console.WriteLine("Morate uneti tekst za pretragu.");
+            return;
+        }
+
+        var rezultati = _servis.PrikaziSve()
+            .Where(p =>
+                p.Ime.Contains(unos, StringComparison.OrdinalIgnoreCase) ||
+                p.Prezime.Contains(unos, StringComparison.OrdinalIgnoreCase) ||
+                p.BrojClanskeKarte.Contains(
+                    unos, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+
+        if (rezultati.Count == 0)
+        {
+            System.Console.WriteLine("Nema pronadjenih posetilaca.");
+            return;
+        }
+
+        System.Console.WriteLine(
+            $"\nPronadjeno posetilaca: {rezultati.Count}");
+
+        foreach (var p in rezultati)
+        {
+            System.Console.WriteLine("------------------------------");
+            System.Console.WriteLine($"ID: {p.Id}");
+            System.Console.WriteLine($"Ime: {p.Ime}");
+            System.Console.WriteLine($"Prezime: {p.Prezime}");
+            System.Console.WriteLine(
+                $"Broj clanske karte: {p.BrojClanskeKarte}");
+            System.Console.WriteLine($"Status: {p.Status}");
+            System.Console.WriteLine($"Email: {p.Email}");
+        }
+    }
+
+    private void SortirajPosetioce()
+    {
+        var posetioci = _servis.PrikaziSve();
+
+        if (posetioci.Count == 0)
+        {
+            System.Console.WriteLine("Nema posetilaca za sortiranje.");
+            return;
+        }
+
+        System.Console.WriteLine("\n--- SORTIRANJE POSETILACA ---");
+        System.Console.WriteLine("1. Po imenu");
+        System.Console.WriteLine("2. Po prezimenu");
+        System.Console.WriteLine("3. Po broju clanske karte");
+
+        System.Console.Write("Izaberi kriterijum: ");
+        string? kriterijum = System.Console.ReadLine();
+
+        if (kriterijum != "1" &&
+            kriterijum != "2" &&
+            kriterijum != "3")
+        {
+            System.Console.WriteLine("Nepostojeci kriterijum.");
+            return;
+        }
+
+        System.Console.WriteLine("\n1. Rastuce (A-Z)");
+        System.Console.WriteLine("2. Opadajuce (Z-A)");
+
+        System.Console.Write("Izaberi redosled: ");
+        string? redosled = System.Console.ReadLine();
+
+        if (redosled != "1" && redosled != "2")
+        {
+            System.Console.WriteLine("Nepostojeci redosled.");
+            return;
+        }
+
+        bool rastuce = redosled == "1";
+
+        var sortirani = kriterijum switch
+        {
+            "1" => rastuce
+                ? posetioci.OrderBy(p => p.Ime, StringComparer.OrdinalIgnoreCase)
+                : posetioci.OrderByDescending(p => p.Ime, StringComparer.OrdinalIgnoreCase),
+
+            "2" => rastuce
+                ? posetioci.OrderBy(p => p.Prezime, StringComparer.OrdinalIgnoreCase)
+                : posetioci.OrderByDescending(p => p.Prezime, StringComparer.OrdinalIgnoreCase),
+
+            _ => rastuce
+                ? posetioci.OrderBy(p => p.BrojClanskeKarte, StringComparer.OrdinalIgnoreCase)
+                : posetioci.OrderByDescending(p => p.BrojClanskeKarte, StringComparer.OrdinalIgnoreCase)
+        };
+
+        System.Console.WriteLine("\n--- SORTIRANI POSETIOCI ---");
+
+        foreach (var p in sortirani)
+        {
+            System.Console.WriteLine("------------------------------");
+            System.Console.WriteLine($"ID: {p.Id}");
+            System.Console.WriteLine($"Ime: {p.Ime}");
+            System.Console.WriteLine($"Prezime: {p.Prezime}");
+            System.Console.WriteLine($"Broj clanske karte: {p.BrojClanskeKarte}");
+            System.Console.WriteLine($"Status: {p.Status}");
+        }
+    }
 
 }

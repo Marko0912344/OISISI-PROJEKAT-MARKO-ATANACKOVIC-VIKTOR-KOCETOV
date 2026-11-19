@@ -30,11 +30,12 @@ public class KupovinaServis
             .ToList();
     }
 
+
     public void Dodaj(Kupovina kupovina)
     {
         if (kupovina.Id <= 0 ||
-    kupovina.PosetilacId <= 0 ||
-    kupovina.KnjigaId <= 0)
+            kupovina.PosetilacId <= 0 ||
+            kupovina.KnjigaId <= 0)
         {
             throw new InvalidOperationException(
                 "ID kupovine, posetioca i knjige moraju biti pozitivni.");
@@ -53,8 +54,18 @@ public class KupovinaServis
         }
 
         _kupovine.Add(kupovina);
-        _skladiste.Sacuvaj(_kupovine);
+
+        try
+        {
+            _skladiste.Sacuvaj(_kupovine);
+        }
+        catch
+        {
+            _kupovine.Remove(kupovina);
+            throw;
+        }
     }
+
 
 
     public bool Izmeni(Kupovina izmenjenaKupovina)
@@ -114,6 +125,7 @@ public class KupovinaServis
 
         return true;
     }
+
     public bool Obrisi(int id)
     {
         Kupovina? kupovina = _kupovine
@@ -124,10 +136,33 @@ public class KupovinaServis
             return false;
         }
 
-        _kupovine.Remove(kupovina);
-        _skladiste.Sacuvaj(_kupovine);
+        int indeks = _kupovine.IndexOf(kupovina);
+
+        _kupovine.RemoveAt(indeks);
+
+        try
+        {
+            _skladiste.Sacuvaj(_kupovine);
+        }
+        catch
+        {
+            _kupovine.Insert(indeks, kupovina);
+            throw;
+        }
 
         return true;
     }
+
+
+    public int GenerisiSledeciId()
+    {
+        if (_kupovine.Count == 0)
+        {
+            return 1;
+        }
+
+        return _kupovine.Max(k => k.Id) + 1;
+    }
+
 
 }

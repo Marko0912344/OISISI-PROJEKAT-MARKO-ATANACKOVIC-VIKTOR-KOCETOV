@@ -115,17 +115,18 @@ public class KupovineMeni : IMeniModul
         }
     }
 
+
+
     private void Dodaj()
     {
-        System.Console.Write("ID kupovine: ");
-        if (!int.TryParse(System.Console.ReadLine(), out int id) || id <= 0)
-        {
-            System.Console.WriteLine("Neispravan ID kupovine.");
-            return;
-        }
+        int id = _servis.GenerisiSledeciId();
+
+        System.Console.WriteLine(
+            $"Automatski dodeljen ID kupovine: {id}");
 
         System.Console.Write("ID posetioca: ");
-        if (!int.TryParse(System.Console.ReadLine(), out int posetilacId) || posetilacId <= 0)
+        if (!int.TryParse(System.Console.ReadLine(), out int posetilacId) ||
+            posetilacId <= 0)
         {
             System.Console.WriteLine("Neispravan ID posetioca.");
             return;
@@ -152,7 +153,8 @@ public class KupovineMeni : IMeniModul
         }
 
         System.Console.Write("ID knjige: ");
-        if (!int.TryParse(System.Console.ReadLine(), out int knjigaId) || knjigaId <= 0)
+        if (!int.TryParse(System.Console.ReadLine(), out int knjigaId) ||
+            knjigaId <= 0)
         {
             System.Console.WriteLine("Neispravan ID knjige.");
             return;
@@ -208,6 +210,15 @@ public class KupovineMeni : IMeniModul
             return;
         }
 
+        if (datumKupovine.Date > DateTime.Today)
+        {
+            System.Console.WriteLine(
+                "Datum kupovine ne moze biti u buducnosti.");
+            return;
+        }
+
+
+
         System.Console.Write("Ocena (1-5): ");
         if (!int.TryParse(System.Console.ReadLine(), out int ocena) ||
             ocena < 1 || ocena > 5)
@@ -228,8 +239,6 @@ public class KupovineMeni : IMeniModul
             Ocena = ocena,
             Komentar = komentar
         };
-
-
 
         try
         {
@@ -267,9 +276,7 @@ public class KupovineMeni : IMeniModul
         {
             System.Console.WriteLine(ex.Message);
         }
-
     }
-
 
 
 

@@ -8,6 +8,8 @@ public class Izdavac : IEntitet
 {
     public int Id { get; set; }
 
+    public string Sifra { get; set; } = "";
+
     public string Naziv { get; set; } = "";
 
     public int? SefId { get; set; }

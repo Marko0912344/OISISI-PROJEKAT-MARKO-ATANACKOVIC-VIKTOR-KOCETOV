@@ -196,4 +196,15 @@ public class KnjigaServis
         return true;
     }
 
+    public int GenerisiSledeciId()
+    {
+        if (_knjige.Count == 0)
+        {
+            return 1;
+        }
+
+        return _knjige.Max(k => k.Id) + 1;
+    }
+
+
 }

@@ -75,6 +75,7 @@ public class IzdavaciMeni : IMeniModul
 
 
 
+
     private void Prikazi()
     {
         var izdavaci = _servis.PrikaziSve();
@@ -98,6 +99,7 @@ public class IzdavaciMeni : IMeniModul
         {
             System.Console.WriteLine("\n------------------------------");
             System.Console.WriteLine($"ID: {i.Id}");
+            System.Console.WriteLine($"Sifra: {i.Sifra}");
             System.Console.WriteLine($"Naziv: {i.Naziv}");
 
             System.Console.WriteLine(
@@ -136,19 +138,27 @@ public class IzdavaciMeni : IMeniModul
         System.Console.WriteLine("------------------------------");
     }
 
+
+
+
+
     private void Dodaj()
     {
-        System.Console.Write("ID izdavaca: ");
+        int id = _servis.GenerisiSledeciId();
 
+        System.Console.WriteLine($"Automatski dodeljen ID izdavaca: {id}");
 
-        if (!int.TryParse(System.Console.ReadLine(), out int id) || id <= 0)
+        System.Console.Write("Sifra izdavaca: ");
+        string sifra = (System.Console.ReadLine() ?? "").Trim();
+
+        if (string.IsNullOrWhiteSpace(sifra))
         {
-            System.Console.WriteLine("ID mora biti pozitivan broj.");
+            System.Console.WriteLine("Sifra izdavaca je obavezna.");
             return;
         }
 
         System.Console.Write("Naziv izdavaca: ");
-        string naziv = System.Console.ReadLine() ?? "";
+        string naziv = (System.Console.ReadLine() ?? "").Trim();
 
         if (string.IsNullOrWhiteSpace(naziv))
         {
@@ -156,7 +166,7 @@ public class IzdavaciMeni : IMeniModul
             return;
         }
 
-        System.Console.Write("ID šefa izdavača (Enter ako nema): ");
+        System.Console.Write("ID sefa izdavaca (Enter ako nema): ");
         string unosSefa = System.Console.ReadLine() ?? "";
 
         int? sefId = null;
@@ -165,7 +175,7 @@ public class IzdavaciMeni : IMeniModul
         {
             if (!int.TryParse(unosSefa, out int idSefa) || idSefa <= 0)
             {
-                System.Console.WriteLine("Neispravan ID šefa.");
+                System.Console.WriteLine("Neispravan ID sefa.");
                 return;
             }
 
@@ -192,7 +202,6 @@ public class IzdavaciMeni : IMeniModul
             }
         }
 
-
         string putanjaAutori = Path.Combine(
             AppContext.BaseDirectory,
             "Podaci",
@@ -212,8 +221,7 @@ public class IzdavaciMeni : IMeniModul
         {
             if (autorServis.PronadjiPoId(autorId) == null)
             {
-                System.Console.WriteLine(
-                    $"Autor sa ID-jem {autorId} ne postoji.");
+                System.Console.WriteLine($"Autor sa ID-jem {autorId} ne postoji.");
                 return;
             }
         }
@@ -221,6 +229,7 @@ public class IzdavaciMeni : IMeniModul
         Izdavac novi = new Izdavac
         {
             Id = id,
+            Sifra = sifra,
             Naziv = naziv,
             SefId = sefId,
             AutorIds = autorIds
@@ -236,6 +245,8 @@ public class IzdavaciMeni : IMeniModul
             System.Console.WriteLine(ex.Message);
         }
     }
+
+
 
 
     private void Izmeni()
@@ -257,13 +268,23 @@ public class IzdavaciMeni : IMeniModul
             return;
         }
 
+        System.Console.Write($"Nova sifra ({postojeci.Sifra}): ");
+        string sifra = (System.Console.ReadLine() ?? "").Trim();
+
+        if (string.IsNullOrWhiteSpace(sifra))
+            sifra = postojeci.Sifra;
+
+        if (string.IsNullOrWhiteSpace(sifra))
+        {
+            System.Console.WriteLine("Sifra izdavaca je obavezna.");
+            return;
+        }
+
         System.Console.Write($"Novi naziv ({postojeci.Naziv}): ");
-        string naziv = System.Console.ReadLine() ?? "";
+        string naziv = (System.Console.ReadLine() ?? "").Trim();
 
         if (string.IsNullOrWhiteSpace(naziv))
             naziv = postojeci.Naziv;
-        else
-            naziv = naziv.Trim();
 
         System.Console.Write(
             $"Novi ID sefa ({postojeci.SefId?.ToString() ?? "nema"}) " +
@@ -321,9 +342,12 @@ public class IzdavaciMeni : IMeniModul
         }
 
         string putanjaAutori = Path.Combine(
-            AppContext.BaseDirectory, "Podaci", "autori.xml");
+            AppContext.BaseDirectory,
+            "Podaci",
+            "autori.xml"
+        );
 
-        var autorServis = new AutorServis(putanjaAutori);
+        AutorServis autorServis = new AutorServis(putanjaAutori);
 
         if (sefId.HasValue && !autorServis.MozeBitiSef(sefId.Value))
         {
@@ -336,8 +360,7 @@ public class IzdavaciMeni : IMeniModul
         {
             if (autorServis.PronadjiPoId(autorId) == null)
             {
-                System.Console.WriteLine(
-                    $"Autor sa ID-jem {autorId} ne postoji.");
+                System.Console.WriteLine($"Autor sa ID-jem {autorId} ne postoji.");
                 return;
             }
         }
@@ -345,6 +368,7 @@ public class IzdavaciMeni : IMeniModul
         var izmenjeni = new Izdavac
         {
             Id = postojeci.Id,
+            Sifra = sifra,
             Naziv = naziv,
             SefId = sefId,
             AutorIds = autorIds
@@ -363,6 +387,7 @@ public class IzdavaciMeni : IMeniModul
                 "Greska prilikom izmene izdavaca: " + ex.Message);
         }
     }
+
 
     private void Obrisi()
     {
