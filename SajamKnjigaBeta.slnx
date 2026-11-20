@@ -1,4 +1,5 @@
 <Solution>
-  <Project Path="SajamKnjiga.Core/SajamKnjiga.Core.csproj" />
   <Project Path="SajamKnjiga.Console/SajamKnjiga.Console.csproj" />
+  <Project Path="SajamKnjiga.Core/SajamKnjiga.Core.csproj" />
+  <Project Path="SajamKnjiga.Test/SajamKnjiga.Test.csproj" Id="d4855dd5-40e2-40f6-bcf5-7e56356eac8c" />
 </Solution>

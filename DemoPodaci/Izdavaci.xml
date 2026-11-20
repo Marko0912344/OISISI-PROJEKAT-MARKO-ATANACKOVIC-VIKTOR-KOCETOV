@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ArrayOfIzdavac xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Izdavac>
+    <Id>1</Id>
+    <Naziv>Dunavska knjiga</Naziv>
+    <SefId>1</SefId>
+  </Izdavac>
+  <Izdavac>
+    <Id>2</Id>
+    <Naziv>Severni list</Naziv>
+    <SefId>5</SefId>
+  </Izdavac>
+  <Izdavac>
+    <Id>3</Id>
+    <Naziv>Atlas izdavastvo</Naziv>
+    <SefId>9</SefId>
+  </Izdavac>
+  <Izdavac>
+    <Id>4</Id>
+    <Naziv>Mostovi znanja</Naziv>
+    <SefId>13</SefId>
+  </Izdavac>
+</ArrayOfIzdavac>
