@@ -1,4 +1,6 @@
 <Solution>
   <Project Path="SajamKnjiga.Core/SajamKnjiga.Core.csproj" />
   <Project Path="SajamKnjiga.Console/SajamKnjiga.Console.csproj" />
+  <Project Path="SajamKnjiga.SmokeTests/SajamKnjiga.SmokeTests.csproj" />
+  <Project Path="SajamKnjiga.SpecTests/SajamKnjiga.SpecTests.csproj" />
 </Solution>

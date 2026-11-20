@@ -1,22 +1,27 @@
-using System.Text;
+// Ulazna tacka: oporavak XML transakcija i pokretanje konzolnog menija.
+using System;
 using SajamKnjiga.ConsoleApp;
+using SajamKnjiga.Core.Persistence;
 
-Console.OutputEncoding = Encoding.UTF8;
-
-while (true)
+try
 {
-    var moduli = MeniModuli.Napravi();
-    Console.WriteLine("\n=== SAJAM KNJIGA - ZAJEDNICKA KONZOLA ===");
-    for (int i = 0; i < moduli.Count; i++)
-        Console.WriteLine($"{i + 1}. {moduli[i].Naziv}");
-    Console.WriteLine("0. Izlaz");
-    Console.Write("Izbor: ");
-    string? unos = Console.ReadLine();
-    if (unos == "0") break;
-    if (int.TryParse(unos, out int n) && n >= 1 && n <= moduli.Count)
+    // Ovo mora da se desi PRE bilo kakvog rada sa podacima.
+    int broj = XmlTransakcija.OporaviPrekinute();
+
+    if (broj > 0)
     {
-        try { moduli[n - 1].Pokreni(); }
-        catch (Exception ex) { Console.WriteLine("Greska: " + ex.Message); }
+        Console.WriteLine(
+            $"Provereno/oporavljeno dnevnika transakcija: {broj}.");
+        Console.WriteLine(
+            "Proveri podatke pre nastavljanja rada.");
     }
-    else Console.WriteLine("Nepostojeca opcija.");
+
+    KonzolniMeni meni = new KonzolniMeni();
+    meni.Pokreni();
+}
+catch (Exception ex)
+{
+    Console.WriteLine("Pokretanje je prekinuto: " + ex.Message);
+    Console.WriteLine(
+        "Nemoj nastavljati rad sa XML datotekama pre otklanjanja greske.");
 }
